@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,22 +42,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.saswat10.instagramclone.R
+import com.saswat10.instagramclone.components.common.SimpleHeader
+import com.saswat10.instagramclone.viewmodels.LoginViewState
+import com.saswat10.instagramclone.viewmodels.RegisterViewModel
+import com.saswat10.instagramclone.viewmodels.RegisterViewState
 import timber.log.Timber
 
 @Composable
-fun RegisterScreen(modifier: Modifier) {
+fun RegisterScreen(
+    modifier: Modifier,
+    registerViewModel: RegisterViewModel = hiltViewModel<RegisterViewModel>()
+) {
     Column(modifier) {
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         var confirmPassword by remember { mutableStateOf("") }
         var showPassword by remember { mutableStateOf(false) }
         var showConfirmPassword by remember { mutableStateOf(false) }
+        val viewState by registerViewModel.viewState.collectAsState()
 
 
 
-        Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            SimpleHeader("Register", onBack = {})
 
             Column(
                 modifier = Modifier
@@ -90,14 +102,14 @@ fun RegisterScreen(modifier: Modifier) {
                     label = { Text("Confirm Password") },
                     modifier = Modifier.fillMaxWidth(),
                     trailingIcon = {
-                        IconButton(onClick = { showPassword = !showPassword }) {
+                        IconButton(onClick = { showConfirmPassword = !showConfirmPassword }) {
                             Icon(
-                                imageVector = if (showPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                imageVector = if (showConfirmPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                                 contentDescription = null
                             )
                         }
                     },
-                    visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (showConfirmPassword) VisualTransformation.None else PasswordVisualTransformation(),
                 )
                 Column(Modifier.fillMaxWidth()) {
                     AnimatedVisibility(password.isNotEmpty() && password.length < 8) {
@@ -135,41 +147,71 @@ fun RegisterScreen(modifier: Modifier) {
                             color = MaterialTheme.colorScheme.error
                         )
                     }
+                    AnimatedVisibility(password.isNotEmpty() && confirmPassword.isNotEmpty() && password != confirmPassword) {
+                        Text(
+                            "Password don't match",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
 
 
                 }
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     Spacer(modifier.width(5.dp))
-                    Button(onClick = {
-                        Timber.tag("Register").d("Email: $email, Password: $password")
-                    }) {
-                        Text("Register")
+                    Button(
+                        onClick = {
+                            registerViewModel.register(email, password, confirmPassword)
+                        },
+                        enabled = (email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && password == confirmPassword)
+                    ) {
+                        if (viewState == RegisterViewState.Loading) CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(
+                                    20.dp
+                                )
+                                .fillMaxWidth(), color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        else
+                            Text("Sign In")
                     }
                 }
-                Box() {
-                    HorizontalDivider(modifier = Modifier.align(Alignment.Center))
-                    Text(
-                        "OR",
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .background(color = MaterialTheme.colorScheme.surface)
-                            .padding(horizontal = 10.dp),
-                        color = Color.Gray
-                    )
+                when(viewState){
+                    is RegisterViewState.Loading -> {}
+                    is RegisterViewState.Error -> {}
+                    is RegisterViewState.Success -> {
+                        Text("Success")
+                        Timber.tag("Success").d((viewState as RegisterViewState.Success).user.email)
+                    }
+                    else -> {}
                 }
 
-                TextButton(onClick = {
-                    Timber.tag("Forgot").d("")
-                }) {
-                    Image(
-                        painter = painterResource(R.drawable.google),
-                        contentDescription = null,
-                        Modifier.size(20.dp)
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    Text("Sign Up With Google")
-                }
+
+
+//                Box() {
+//                    HorizontalDivider(modifier = Modifier.align(Alignment.Center))
+//                    Text(
+//                        "OR",
+//                        modifier = Modifier
+//                            .align(Alignment.Center)
+//                            .background(color = MaterialTheme.colorScheme.surface)
+//                            .padding(horizontal = 10.dp),
+//                        color = Color.Gray
+//                    )
+//                }
+//
+//                TextButton(onClick = {
+//                    Timber.tag("Forgot").d("")
+//                }) {
+//                    Image(
+//                        painter = painterResource(R.drawable.google),
+//                        contentDescription = null,
+//                        Modifier.size(20.dp)
+//                    )
+//                    Spacer(Modifier.width(10.dp))
+//                    Text("Sign Up With Google")
+//                }
 
                 Spacer(modifier)
 
@@ -177,52 +219,3 @@ fun RegisterScreen(modifier: Modifier) {
         }
     }
 }
-
-
-//fun RegisterScreen(modifier: Modifier, firebaseAuth: FirebaseAuth) {
-//    Column(modifier) {
-//
-//        var user by remember { mutableStateOf(firebaseAuth.currentUser) }
-//
-//        Text(user?.email.toString())
-//
-//        Button(modifier = modifier, onClick = {
-//            firebaseAuth.createUserWithEmailAndPassword("saswat101@outlook.com", "1")
-//                .addOnSuccessListener {  }
-//                .addOnFailureListener {
-//                    Timber.tag("Register").e(it.localizedMessage)
-//                }
-//        }) {
-//            Text(text = "Register")
-//        }
-//
-//
-//        Button(modifier = modifier, onClick = {
-//            firebaseAuth.signInWithEmailAndPassword("saswat1091@outlook.com", "Saswat@1091")
-//                .addOnSuccessListener {
-//                    user = it.user
-//                }.addOnFailureListener {
-//                    Timber.tag("Register").e(it.localizedMessage)
-//                }
-//        }) {
-//            Text(text = "Login")
-//        }
-//
-//        Button(modifier = modifier, onClick = {
-//            user?.sendEmailVerification()
-//        }) {
-//            Text(text = "Email Verification")
-//        }
-//
-//        Button(modifier = modifier, onClick = {
-//        }) {
-//            Text(text = "Logout")
-//        }
-//
-//        Button(modifier = modifier, onClick = {
-//            firebaseAuth.signOut()
-//        }) {
-//            Text(text = "Logout")
-//        }
-//    }
-//}
