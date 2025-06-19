@@ -1,9 +1,11 @@
 package com.saswat10.instagramclone.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.createGraph
 import androidx.navigation.toRoute
 import com.saswat10.instagramclone.navigation.LoginScreen
 import com.saswat10.instagramclone.screens.authScreens.LoginScreen
@@ -21,15 +23,12 @@ data object RegisterScreen
 @Serializable
 data object PasswordScreen
 
-
-@Composable
-fun AuthNavGraph(navController: NavHostController){
-    NavHost(navController = navController, startDestination = LoginScreen) {
-        composable<LoginScreen> {backStack ->
+fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
+        composable<LoginScreen> { backStack ->
             val login: LoginScreen = backStack.toRoute()
             LoginScreen(
                 navigateToRegister = {
-                    navController.navigate(route = RegisterScreen, )
+                    navController.navigate(route = RegisterScreen)
                 },
                 navigateToPassword = {
                     navController.navigate(route = PasswordScreen)
@@ -38,5 +37,4 @@ fun AuthNavGraph(navController: NavHostController){
         }
         composable<RegisterScreen> { RegisterScreen(navController = navController) }
         composable<PasswordScreen> { ResetPassword(navController = navController) }
-    }
 }

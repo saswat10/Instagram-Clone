@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.saswat10.instagramclone.navigation.AuthNavGraph
+import com.saswat10.instagramclone.navigation.RootNavGraph
 import com.saswat10.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }) { it ->
                     Column(Modifier.padding(it)) {
-                        AuthNavGraph(navController)
+                        RootNavGraph(firebaseAuth)
                     }
                 }
             }

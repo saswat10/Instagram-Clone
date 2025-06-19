@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,18 +30,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.saswat10.instagramclone.R
 import com.saswat10.instagramclone.components.common.SimpleHeader
+import com.saswat10.instagramclone.repository.FirebaseAuthRepository
+import com.saswat10.instagramclone.viewmodels.UpdateViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UpdateProfile(modifier: Modifier) {
-    var displayName by remember{ mutableStateOf("") }
-    var fullName by remember{ mutableStateOf("") }
-    var bio by remember{ mutableStateOf("") }
+fun UpdateProfile(updateViewModel: UpdateViewModel = hiltViewModel<UpdateViewModel>()) {
+    var displayName by remember { mutableStateOf("") }
+    var fullName by remember { mutableStateOf("") }
+    var bio by remember { mutableStateOf("") }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
     ) {
         SimpleHeader("Update Profile")
         Column(
@@ -64,11 +68,14 @@ fun UpdateProfile(modifier: Modifier) {
                     onClick = {
                         TODO()
                     },
-                    modifier = Modifier.align(Alignment.BottomEnd).padding(5.dp).border(
-                        width = 4.dp,
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = CircleShape
-                    )
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(5.dp)
+                        .border(
+                            width = 4.dp,
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = CircleShape
+                        )
                 ) {
                     Icon(imageVector = Icons.Rounded.Edit, contentDescription = null)
                 }
@@ -91,6 +98,11 @@ fun UpdateProfile(modifier: Modifier) {
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Say something about yourself") }
             )
+            TextButton(onClick = {
+                updateViewModel.signOut()
+            }) {
+                Text(text = "SignOut")
+            }
 
         }
 

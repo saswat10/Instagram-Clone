@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.saswat10.instagramclone.components.common.SimpleHeader
+import com.saswat10.instagramclone.navigation.UpdateProfile
 import com.saswat10.instagramclone.viewmodels.RegisterViewModel
 import com.saswat10.instagramclone.viewmodels.RegisterViewState
 import timber.log.Timber
@@ -162,8 +163,11 @@ fun RegisterScreen(
                 is RegisterViewState.Loading -> {}
                 is RegisterViewState.Error -> {}
                 is RegisterViewState.Success -> {
-                    Text("Success")
-                    Timber.tag("Success").d((viewState as RegisterViewState.Success).user?.email)
+                    navController.navigate(UpdateProfile){
+                        popUpTo(0){
+                            inclusive = true
+                        }
+                    }
                 }
 
                 else -> {}

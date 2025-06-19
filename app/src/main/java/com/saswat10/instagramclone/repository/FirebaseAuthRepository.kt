@@ -67,4 +67,10 @@ class FirebaseAuthRepository @Inject constructor(private val auth: FirebaseAuth)
         }
     }
 
+    fun signOut(){
+        return auth.signOut()
+    }
+
+
+
 }
