@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    kotlin("plugin.serialization") version "2.0.21"
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
@@ -54,6 +55,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    implementation("androidx.core:core-splashscreen:1.0.0")
+
     implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
@@ -64,6 +67,7 @@ dependencies {
 
 
     implementation("com.google.dagger:hilt-android:2.56.2")
+    implementation(libs.firebase.firestore.ktx)
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
 
     implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")

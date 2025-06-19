@@ -50,7 +50,11 @@ import com.saswat10.instagramclone.viewmodels.LoginViewState
 import timber.log.Timber
 
 @Composable
-fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = hiltViewModel<LoginViewModel>()) {
+fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel<LoginViewModel>(),
+    navigateToRegister: () -> Unit,
+    navigateToPassword: () -> Unit
+) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -60,11 +64,11 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = hiltViewModel<Lo
 
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(5.dp)
@@ -83,7 +87,7 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = hiltViewModel<Lo
                 fontWeight = FontWeight.Bold
 
             )
-            Spacer(modifier)
+            Spacer(Modifier)
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -109,11 +113,11 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = hiltViewModel<Lo
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 TextButton(onClick = {
-                    Timber.tag("Forgot").d("Forgot Password")
+                    navigateToPassword()
                 }) {
                     Text("Forgot Password?")
                 }
-                Spacer(modifier.width(5.dp))
+                Spacer(Modifier.width(5.dp))
                 Button(onClick = {
                     viewModel.login(email, password)
                 }) {
@@ -136,7 +140,7 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = hiltViewModel<Lo
 //                }
                 is LoginViewState.Success -> {
                     Text("Success")
-                    Timber.tag("Success").d((state as LoginViewState.Success).user.uid)
+                    Timber.tag("Success").d((state as LoginViewState.Success).user?.uid)
                 }
 
                 else -> {}
@@ -189,7 +193,9 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = hiltViewModel<Lo
                     "Sign Up",
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable {}
+                    modifier = Modifier.clickable {
+                        navigateToRegister()
+                    }
                 )
             }
 

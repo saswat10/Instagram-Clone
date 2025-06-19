@@ -18,30 +18,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.saswat10.instagramclone.components.common.SimpleHeader
 import com.saswat10.instagramclone.viewmodels.ResetPasswordViewModel
 
 @Composable
-fun ResetPassword(modifier: Modifier, viewModel: ResetPasswordViewModel = hiltViewModel<ResetPasswordViewModel>()) {
+fun ResetPassword(
+    navController: NavHostController,
+    viewModel: ResetPasswordViewModel = hiltViewModel<ResetPasswordViewModel>()
+) {
     var email by remember { mutableStateOf("") }
     val state by viewModel.viewState.collectAsState()
 
-    Column(
-        modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
 
-        OutlinedTextField(
-            value = email,
-            onValueChange = {email = it},
-            Modifier.fillMaxWidth(),
-            label = { Text("Email") })
-        Button(onClick = {
-            viewModel.resetPassword(email)
-        }, Modifier.align(Alignment.End)) {
-            Text("Send Reset Email")
+
+    Column {
+        SimpleHeader("Password Reset", onBack = {navController.popBackStack()})
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                Modifier.fillMaxWidth(),
+                label = { Text("Email") })
+            Button(onClick = {
+                viewModel.resetPassword(email)
+            }, Modifier.align(Alignment.End)) {
+                Text("Send Reset Email")
+            }
         }
     }
+
 }

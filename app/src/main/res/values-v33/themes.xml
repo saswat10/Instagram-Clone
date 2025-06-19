@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.App.SplashScreen" parent="Theme.InstagramClone">
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/animated_logo</item>
+        <item name="android:windowSplashScreenAnimationDuration">1000</item>
+        <item name="android:windowSplashScreenBehavior">icon_preferred</item>
+    </style>
+</resources>

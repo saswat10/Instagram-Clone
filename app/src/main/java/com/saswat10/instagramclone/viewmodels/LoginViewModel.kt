@@ -17,7 +17,7 @@ import javax.inject.Inject
 sealed interface LoginViewState {
     object Loading : LoginViewState
     data class Error(val message: String) : LoginViewState
-    data class Success(val user: FirebaseUser) : LoginViewState
+    data class Success(val user: FirebaseUser?) : LoginViewState
 }
 
 @HiltViewModel

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,9 +17,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.saswat10.instagramclone.screens.authScreens.RegisterScreen
-import com.saswat10.instagramclone.screens.authScreens.ResetPassword
+import com.saswat10.instagramclone.navigation.AuthNavGraph
 import com.saswat10.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,11 +30,13 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            // navigation
+            val navController = rememberNavController()
+
             WindowCompat.setDecorFitsSystemWindows(window, false)
             // snackbar definition
             val snackbarHostState = remember { SnackbarHostState() }
@@ -46,14 +49,17 @@ class MainActivity : ComponentActivity() {
             InstagramCloneTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
+                    topBar = {},
                     snackbarHost = {
                         SnackbarHost(
                             snackbarHostState, modifier = Modifier.padding(
                                 WindowInsets.ime.asPaddingValues()
                             )
                         )
-                    }) {
-                    ResetPassword(modifier = Modifier.padding(it))
+                    }) { it ->
+                    Column(Modifier.padding(it)) {
+                        AuthNavGraph(navController)
+                    }
                 }
             }
         }

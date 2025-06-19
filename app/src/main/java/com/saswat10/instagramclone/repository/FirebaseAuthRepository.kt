@@ -12,9 +12,9 @@ import kotlin.coroutines.suspendCoroutine
 
 class FirebaseAuthRepository @Inject constructor(private val auth: FirebaseAuth) {
 
-    var currentUser: FirebaseUser = auth.currentUser!!
+    var currentUser: FirebaseUser? = auth.currentUser
 
-    suspend fun signIn(email: String, password: String): Result<FirebaseUser> {
+    suspend fun signIn(email: String, password: String): Result<FirebaseUser?> {
         return try {
             currentUser = suspendCoroutine<FirebaseUser> { cont ->
                 auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
@@ -32,7 +32,7 @@ class FirebaseAuthRepository @Inject constructor(private val auth: FirebaseAuth)
     }
 
 
-    suspend fun register(email: String, password: String): Result<FirebaseUser> {
+    suspend fun register(email: String, password: String): Result<FirebaseUser?> {
         return try {
             currentUser = suspendCoroutine<FirebaseUser> { cont ->
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->

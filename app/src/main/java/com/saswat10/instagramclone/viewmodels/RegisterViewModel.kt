@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.saswat10.instagramclone.SnackBarManager
+import com.saswat10.instagramclone.models.remote.RemoteUser
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
+import com.saswat10.instagramclone.repository.FirestoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,13 +17,14 @@ import javax.inject.Inject
 sealed interface RegisterViewState {
     data class Error(val message: String) : RegisterViewState
     object Loading : RegisterViewState
-    data class Success(val user: FirebaseUser) : RegisterViewState
+    data class Success(val user: FirebaseUser?) : RegisterViewState
 }
 
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val authRepository: FirebaseAuthRepository
+    private val authRepository: FirebaseAuthRepository,
+    private val firestoreRepository: FirestoreRepository
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<RegisterViewState?>(null)
@@ -39,6 +42,10 @@ class RegisterViewModel @Inject constructor(
 
                     .onSuccess {
                         _viewState.value = RegisterViewState.Success(it)
+                        firestoreRepository.createUser(
+                            RemoteUser(email = it?.email.toString()),
+                            it!!.uid
+                        )
                         SnackBarManager.showMessage("Registration Successful")
                     }
                     .onFailure {
