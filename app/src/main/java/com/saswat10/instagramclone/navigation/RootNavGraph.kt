@@ -32,8 +32,8 @@ fun RootNavGraph(firebaseAuth: FirebaseAuth) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        enterTransition = { fadeIn(animationSpec = tween(300)) + slideInHorizontally(initialOffsetX = { it }) },
-        exitTransition = { fadeOut(animationSpec = tween(300)) + slideOutHorizontally(targetOffsetX = { -it }) },
+        enterTransition = { fadeIn(animationSpec = tween(400)) + slideInHorizontally(initialOffsetX = { it }) },
+        exitTransition = { fadeOut(animationSpec = tween(400)) + slideOutHorizontally(targetOffsetX = { -it }) },
         popEnterTransition = {
             fadeIn(animationSpec = tween(300)) + slideInHorizontally(
                 initialOffsetX = { -it })

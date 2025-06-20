@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +9,15 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use {
+        localProperties.load(localPropertiesFile.inputStream())
+    }
+}
+
 
 android {
     namespace = "com.saswat10.instagramclone"
@@ -18,6 +29,32 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField(
+            "String",
+            "API_ENV_VARIABLE",
+            "\"${localProperties.getProperty("API_ENV_VARIABLE")}\""
+        )
+        buildConfigField(
+            "String",
+            "CLOUDINARY_CLOUD_NAME",
+            "\"${localProperties.getProperty("CLOUDINARY_CLOUD_NAME")}\""
+        )
+        buildConfigField(
+            "String",
+            "CLOUDINARY_API_KEY",
+            "\"${localProperties.getProperty("CLOUDINARY_API_KEY")}\""
+        )
+        buildConfigField(
+            "String",
+            "CLOUDINARY_API_SECRET",
+            "\"${localProperties.getProperty("CLOUDINARY_API_SECRET")}\""
+        )
+        buildConfigField(
+            "String",
+            "CLOUDINARY_UPLOAD_PRESET",
+            "\"${localProperties.getProperty("CLOUDINARY_UPLOAD_PRESET")}\""
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -63,6 +100,7 @@ dependencies {
     implementation("androidx.credentials:credentials:1.3.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+    implementation("com.cloudinary:cloudinary-android:2.8.0")
     implementation(libs.play.services.auth)
 
 
@@ -79,6 +117,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
     implementation("androidx.compose.material3.adaptive:adaptive")
     implementation( "com.jakewharton.timber:timber:5.0.1")
+    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.lifecycle.viewmodel.compose)
 
@@ -91,6 +130,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-
 }
+

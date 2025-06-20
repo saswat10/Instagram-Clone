@@ -69,7 +69,10 @@ class MainActivity : ComponentActivity() {
 
 
 object SnackBarManager {
-    private val _messages = MutableSharedFlow<String>()
+    private val _messages = MutableSharedFlow<String>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
     val messages = _messages.asSharedFlow()
 
     suspend fun showMessage(message: String) {

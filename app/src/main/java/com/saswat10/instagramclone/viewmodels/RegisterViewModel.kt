@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 sealed interface RegisterViewState {
@@ -45,8 +46,12 @@ class RegisterViewModel @Inject constructor(
                         firestoreRepository.createUser(
                             RemoteUser(email = it?.email.toString()),
                             it!!.uid
-                        )
-                        SnackBarManager.showMessage("Registration Successful")
+                        ).onSuccess {
+                            Timber.tag("RegisterViewModel").d(it)
+                            SnackBarManager.showMessage(it)
+                        }.onFailure {
+                            SnackBarManager.showMessage(it.localizedMessage ?: "Unknown error")
+                        }
                     }
                     .onFailure {
                         _viewState.value =
