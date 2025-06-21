@@ -30,6 +30,9 @@ data object ChatScreen
 @Serializable
 data object ProfileScreen
 
+@Serializable
+data object Notifications
+
 
 fun NavGraphBuilder.mainNavGraph(navController: NavHostController) {
     composable<UpdateProfile> {

@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.8.1")
 
     implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
     implementation("com.google.firebase:firebase-analytics")

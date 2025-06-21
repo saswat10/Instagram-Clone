@@ -79,8 +79,8 @@ fun LoginScreen(
                 style = MaterialTheme.typography.headlineLarge + TextStyle(
                     brush = Brush.linearGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.tertiary
+                            Color.Cyan,
+                            Color.Yellow,
                         )
                     )
                 ),
