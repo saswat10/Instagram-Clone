@@ -1,7 +1,9 @@
 package com.saswat10.instagramclone
 
+import android.graphics.Color.TRANSPARENT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var firebaseAuth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -38,6 +41,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             WindowCompat.setDecorFitsSystemWindows(window, false)
+
             // snackbar definition
             val snackbarHostState = remember { SnackbarHostState() }
             LaunchedEffect(Unit) {

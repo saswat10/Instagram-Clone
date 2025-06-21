@@ -24,17 +24,27 @@ data object RegisterScreen
 data object PasswordScreen
 
 fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
-        composable<LoginScreen> { backStack ->
-            val login: LoginScreen = backStack.toRoute()
-            LoginScreen(
-                navigateToRegister = {
-                    navController.navigate(route = RegisterScreen)
-                },
-                navigateToPassword = {
-                    navController.navigate(route = PasswordScreen)
-                }
-            )
-        }
-        composable<RegisterScreen> { RegisterScreen(navController = navController) }
-        composable<PasswordScreen> { ResetPassword(navController = navController) }
+    composable<LoginScreen> { backStack ->
+        val login: LoginScreen = backStack.toRoute()
+        LoginScreen(
+            navigateToRegister = {
+                navController.navigate(route = RegisterScreen)
+            },
+            navigateToPassword = {
+                navController.navigate(route = PasswordScreen)
+            }
+        )
+    }
+    composable<RegisterScreen> {
+        RegisterScreen(
+            navigateToUpdate = {
+                navController.navigate(route = UpdateProfile)
+            },
+            onBack = {
+                navController.popBackStack()
+            }
+
+        )
+    }
+    composable<PasswordScreen> { ResetPassword(navigateBack = { navController.popBackStack() }) }
 }

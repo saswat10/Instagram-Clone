@@ -42,7 +42,8 @@ import timber.log.Timber
 @Composable
 fun RegisterScreen(
     registerViewModel: RegisterViewModel = hiltViewModel<RegisterViewModel>(),
-    navController: NavHostController
+    onBack: (() -> Unit),
+    navigateToUpdate: (() -> Unit)
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -51,7 +52,7 @@ fun RegisterScreen(
     var showConfirmPassword by remember { mutableStateOf(false) }
     val viewState by registerViewModel.viewState.collectAsState()
     Column(modifier = Modifier.fillMaxSize()) {
-        SimpleHeader("Register", onBack = {navController.popBackStack()})
+        SimpleHeader("Register", onBack = { onBack() })
 
         Column(
             modifier = Modifier.padding(20.dp),
@@ -163,11 +164,7 @@ fun RegisterScreen(
                 is RegisterViewState.Loading -> {}
                 is RegisterViewState.Error -> {}
                 is RegisterViewState.Success -> {
-                    navController.navigate(UpdateProfile){
-                        popUpTo(0){
-                            inclusive = true
-                        }
-                    }
+                    navigateToUpdate()
                 }
 
                 else -> {}

@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,16 +36,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import com.saswat10.instagramclone.SnackBarManager
 import com.saswat10.instagramclone.components.common.SimpleHeader
+import com.saswat10.instagramclone.navigation.MainScreen
 import com.saswat10.instagramclone.viewmodels.UpdateViewModel
 import com.saswat10.instagramclone.viewmodels.UpdateViewState
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UpdateProfile(updateViewModel: UpdateViewModel = hiltViewModel<UpdateViewModel>()) {
+fun UpdateProfile(
+    updateViewModel: UpdateViewModel = hiltViewModel<UpdateViewModel>(),
+    onBack:(()->Unit)?=null,
+    navigateToMainScreen:(()->Unit)
+) {
     var displayName by remember { mutableStateOf("") }
     var fullName by remember { mutableStateOf("") }
     var bio by remember { mutableStateOf("") }
@@ -108,9 +112,6 @@ fun UpdateProfile(updateViewModel: UpdateViewModel = hiltViewModel<UpdateViewMod
                     Icon(imageVector = Icons.Rounded.Edit, contentDescription = null)
                 }
             }
-
-
-
             OutlinedTextField(
                 value = displayName,
                 onValueChange = { displayName = it },
@@ -173,6 +174,18 @@ fun UpdateProfile(updateViewModel: UpdateViewModel = hiltViewModel<UpdateViewMod
                 }
             }
 
+
+            when (updateViewState) {
+                is UpdateViewState.Error -> {}
+                is UpdateViewState.Success -> {
+                    navigateToMainScreen()
+                }
+
+                is UpdateViewState.Loading -> {
+                }
+
+                else -> {}
+            }
         }
 
     }

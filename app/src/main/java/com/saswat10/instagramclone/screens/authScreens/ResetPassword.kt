@@ -24,8 +24,8 @@ import com.saswat10.instagramclone.viewmodels.ResetPasswordViewModel
 
 @Composable
 fun ResetPassword(
-    navController: NavHostController,
-    viewModel: ResetPasswordViewModel = hiltViewModel<ResetPasswordViewModel>()
+    viewModel: ResetPasswordViewModel = hiltViewModel<ResetPasswordViewModel>(),
+    navigateBack: (()->Unit)
 ) {
     var email by remember { mutableStateOf("") }
     val state by viewModel.viewState.collectAsState()
@@ -33,7 +33,7 @@ fun ResetPassword(
 
 
     Column {
-        SimpleHeader("Password Reset", onBack = {navController.popBackStack()})
+        SimpleHeader("Password Reset", onBack = {navigateBack()})
         Column(
             Modifier
                 .fillMaxSize()

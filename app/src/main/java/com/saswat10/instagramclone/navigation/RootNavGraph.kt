@@ -26,7 +26,7 @@ fun RootNavGraph(firebaseAuth: FirebaseAuth) {
     val startDestination = if (currentUser.value == null) {
         LoginScreen
     } else {
-        UpdateProfile
+        MainScreen
     }
 
     NavHost(

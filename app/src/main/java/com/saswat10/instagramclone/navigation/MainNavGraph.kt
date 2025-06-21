@@ -7,6 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.createGraph
 import androidx.navigation.navigation
+import com.saswat10.instagramclone.screens.userScreens.AllPostsScreen
+import com.saswat10.instagramclone.screens.userScreens.ChatScreen
+import com.saswat10.instagramclone.screens.userScreens.MainScreen
+import com.saswat10.instagramclone.screens.userScreens.ProfileScreen
 import com.saswat10.instagramclone.screens.userScreens.UpdateProfile
 import kotlinx.serialization.Serializable
 
@@ -14,6 +18,34 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object UpdateProfile
 
+@Serializable
+data object MainScreen
+
+@Serializable
+data object AllPostsScreen
+
+@Serializable
+data object ChatScreen
+
+@Serializable
+data object ProfileScreen
+
+
 fun NavGraphBuilder.mainNavGraph(navController: NavHostController) {
-        composable<UpdateProfile> { UpdateProfile() }
+    composable<UpdateProfile> {
+        UpdateProfile(
+            navigateToMainScreen = {
+                navController.navigate(MainScreen) {
+                    popUpTo(UpdateProfile) {
+                        inclusive = true
+                    }
+                }
+            }
+        )
+    }
+    composable<MainScreen> { MainScreen(
+        updateProfile = {
+            navController.navigate(UpdateProfile)
+        }
+    ) }
 }
