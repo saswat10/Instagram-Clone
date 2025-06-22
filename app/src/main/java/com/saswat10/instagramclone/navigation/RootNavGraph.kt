@@ -8,15 +8,15 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun RootNavGraph(firebaseAuth: FirebaseAuth) {
+fun RootNavGraph(firebaseAuth: FirebaseAuth, modifier: Modifier) {
     val navController = rememberNavController()
     val currentUser = remember { mutableStateOf(firebaseAuth.currentUser) }
-
 
     firebaseAuth.addAuthStateListener {
         currentUser.value = it.currentUser
@@ -30,6 +30,7 @@ fun RootNavGraph(firebaseAuth: FirebaseAuth) {
     }
 
     NavHost(
+        modifier = modifier,
         navController = navController,
         startDestination = startDestination,
         enterTransition = { fadeIn(animationSpec = tween(400)) + slideInHorizontally(initialOffsetX = { it }) },

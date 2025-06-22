@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.sp
 import com.saswat10.instagramclone.R
 
 @Composable
-fun PostCard(modifier: Modifier) {
+fun PostCard() {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
     ) {
@@ -127,8 +127,8 @@ fun PostCard(modifier: Modifier) {
 fun PostCardPreview() {
     Scaffold {
         Column(modifier = Modifier.padding(it)) {
-            PostCard(Modifier)
-            PostCard(Modifier)
+            PostCard()
+            PostCard()
         }
 
     }

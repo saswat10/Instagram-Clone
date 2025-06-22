@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,10 +52,10 @@ fun UpdateProfile(
     onBack:(()->Unit)?=null,
     navigateToMainScreen:(()->Unit)
 ) {
-    var displayName by remember { mutableStateOf("") }
-    var fullName by remember { mutableStateOf("") }
-    var bio by remember { mutableStateOf("") }
-    var selectedUri by remember { mutableStateOf<Uri?>(null) }
+    var displayName by rememberSaveable { mutableStateOf("") }
+    var fullName by rememberSaveable { mutableStateOf("") }
+    var bio by rememberSaveable { mutableStateOf("") }
+    var selectedUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     val updateViewState by updateViewModel.updateViewState.collectAsState()
 
@@ -136,7 +137,7 @@ fun UpdateProfile(
                             updateViewModel.uploadImage(selectedUri!!) { url ->
                                 if (url != null) {
                                     val hashMap = hashMapOf<String, Any>(
-                                        "displayName" to displayName,
+                                        "username" to displayName,
                                         "fullName" to fullName,
                                         "bio" to bio,
                                         "profilePic" to url

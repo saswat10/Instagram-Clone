@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
@@ -52,18 +54,17 @@ class MainActivity : ComponentActivity() {
 
             InstagramCloneTheme {
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = {},
                     snackbarHost = {
                         SnackbarHost(
                             snackbarHostState, modifier = Modifier.padding(
                                 WindowInsets.ime.asPaddingValues()
                             )
                         )
-                    }) { it ->
-                    Column(Modifier.padding(it)) {
-                        RootNavGraph(firebaseAuth)
-                    }
+                    }) { innerPadding ->
+                    RootNavGraph(
+                        firebaseAuth,
+                        modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
+                    )
                 }
             }
         }

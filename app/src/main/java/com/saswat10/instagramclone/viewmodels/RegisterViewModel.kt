@@ -6,7 +6,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.saswat10.instagramclone.SnackBarManager
 import com.saswat10.instagramclone.models.remote.RemoteUser
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
-import com.saswat10.instagramclone.repository.FirestoreRepository
+import com.saswat10.instagramclone.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +25,7 @@ sealed interface RegisterViewState {
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val authRepository: FirebaseAuthRepository,
-    private val firestoreRepository: FirestoreRepository
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<RegisterViewState?>(null)
@@ -43,14 +43,14 @@ class RegisterViewModel @Inject constructor(
 
                     .onSuccess {
                         _viewState.value = RegisterViewState.Success(it)
-                        firestoreRepository.createUser(
-                            RemoteUser(email = it?.email.toString()),
-                            it!!.uid
+                        userRepository.createUser(
+                            user = RemoteUser(email = it?.email.toString()),
+                            uid = it!!.uid
                         ).onSuccess {
                             Timber.tag("RegisterViewModel").d(it)
-                            SnackBarManager.showMessage(it)
+//                            SnackBarManager.showMessage("User Registration Success")
                         }.onFailure {
-                            SnackBarManager.showMessage(it.localizedMessage ?: "Unknown error")
+//                            SnackBarManager.showMessage(it.localizedMessage ?: "Unknown error")
                         }
                     }
                     .onFailure {

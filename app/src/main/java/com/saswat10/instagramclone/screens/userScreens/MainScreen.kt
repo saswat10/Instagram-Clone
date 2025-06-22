@@ -11,7 +11,9 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -42,6 +44,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.LinearGradient
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -78,8 +83,9 @@ fun MainScreen(
 
 
     Scaffold(
+        contentWindowInsets = WindowInsets(top = 0.dp),
+//        containerColor = Color.Transparent,
         floatingActionButton = {
-
             AnimatedVisibility(
                 visible = (selectedDestination == Destinations.HOME.route),
                 enter = fadeIn(),
@@ -94,54 +100,52 @@ fun MainScreen(
 
         },
         bottomBar = {
-            Column {
-                HorizontalDivider()
-                NavigationBar(
-//                    windowInsets = NavigationBarDefaults.windowInsets,
-                    containerColor = MaterialTheme.colorScheme.surface
-                ) {
-                    Destinations.entries.forEachIndexed { index, destination ->
-                        NavigationBarItem(
-                            selected = (selectedDestination == destination.route),
-                            onClick = {
-                                navController.navigate(destination.route) {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
+            NavigationBar(
+                windowInsets = NavigationBarDefaults.windowInsets,
+                tonalElevation = 2.dp,
+                containerColor = Color.Transparent,
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+            ) {
+                Destinations.entries.forEachIndexed { index, destination ->
+                    NavigationBarItem(
+                        selected = (selectedDestination == destination.route),
+                        onClick = {
+                            navController.navigate(destination.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
                                 }
-                                selectedDestination = destination.route
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = destination.icon,
-                                    contentDescription = destination.contentDescription,
-                                    modifier = Modifier.size(26.dp)
-                                )
-                            },
-                            label = {
-                                Text(destination.label)
-                            },
-                            colors = NavigationBarItemColors(
-                                selectedIconColor = MaterialTheme.colorScheme.onSecondary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                selectedIndicatorColor = MaterialTheme.colorScheme.secondary,
-                                unselectedTextColor = MaterialTheme.colorScheme.surface,
-                                disabledIconColor = MaterialTheme.colorScheme.surfaceDim,
-                                disabledTextColor = MaterialTheme.colorScheme.surfaceDim,
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                            selectedDestination = destination.route
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = destination.icon,
+                                contentDescription = destination.contentDescription,
+                                modifier = Modifier.size(26.dp)
                             )
+                        },
+//                        label = {
+//                            Text(destination.label)
+//                        },
+                        colors = NavigationBarItemColors(
+                            selectedIconColor = MaterialTheme.colorScheme.onSecondary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            selectedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                            unselectedTextColor = MaterialTheme.colorScheme.surface,
+                            disabledIconColor = MaterialTheme.colorScheme.surfaceDim,
+                            disabledTextColor = MaterialTheme.colorScheme.surfaceDim,
                         )
-                    }
+                    )
                 }
             }
         }
-    ) { innerPadding ->
+    ) { _ ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding),
             enterTransition = {
                 fadeIn(animationSpec = tween(400)) + slideInHorizontally(
                     initialOffsetX = { it })

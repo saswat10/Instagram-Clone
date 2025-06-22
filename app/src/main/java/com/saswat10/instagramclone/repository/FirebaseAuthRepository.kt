@@ -3,7 +3,7 @@ package com.saswat10.instagramclone.repository
 import com.google.firebase.FirebaseError
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.saswat10.instagramclone.models.User
+import com.saswat10.instagramclone.models.domain.User
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume

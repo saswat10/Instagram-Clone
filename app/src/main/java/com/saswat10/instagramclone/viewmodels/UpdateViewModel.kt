@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.saswat10.instagramclone.SnackBarManager
 import com.saswat10.instagramclone.repository.CloudinaryRepository
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
-import com.saswat10.instagramclone.repository.FirestoreRepository
+import com.saswat10.instagramclone.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UpdateViewModel @Inject constructor(
     private val cloudinaryRepository: CloudinaryRepository,
-    private val firestoreRepository: FirestoreRepository,
+    private val userRepository: UserRepository,
     private val firebaseAuthRepository: FirebaseAuthRepository
 ) : ViewModel() {
 
@@ -43,7 +43,7 @@ class UpdateViewModel @Inject constructor(
     fun updateUser(hashMap: HashMap<String, Any>) {
         viewModelScope.launch {
             _updateViewState.update{  UpdateViewState.Loading }
-            firestoreRepository.updateUser(currentUser.uid, hashMap)
+            userRepository.updateUser(currentUser.uid, hashMap)
                 .onSuccess{
                     _updateViewState.value = UpdateViewState.Success(it)
                     SnackBarManager.showMessage(it)

@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,9 +57,9 @@ fun LoginScreen(
     navigateToPassword: () -> Unit
 ) {
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var showPassword by remember { mutableStateOf(false) }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var showPassword by rememberSaveable { mutableStateOf(false) }
 
     val state by viewModel.viewState.collectAsState()
 
@@ -182,7 +183,7 @@ fun LoginScreen(
             HorizontalDivider()
             Row(
                 modifier = Modifier
-                    .padding(15.dp)
+                    .padding(bottom = 30.dp, top = 15.dp )
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {

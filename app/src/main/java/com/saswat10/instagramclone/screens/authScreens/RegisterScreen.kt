@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,12 +38,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import com.saswat10.instagramclone.components.common.SimpleHeader
-import com.saswat10.instagramclone.navigation.UpdateProfile
 import com.saswat10.instagramclone.viewmodels.RegisterViewModel
 import com.saswat10.instagramclone.viewmodels.RegisterViewState
-import timber.log.Timber
 
 @Composable
 fun RegisterScreen(
@@ -50,15 +47,13 @@ fun RegisterScreen(
     onBack: (() -> Unit),
     navigateToUpdate: (() -> Unit)
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var showPassword by remember { mutableStateOf(false) }
-    var showConfirmPassword by remember { mutableStateOf(false) }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var confirmPassword by rememberSaveable { mutableStateOf("") }
+    var showPassword by rememberSaveable { mutableStateOf(false) }
+    var showConfirmPassword by rememberSaveable { mutableStateOf(false) }
     val viewState by registerViewModel.viewState.collectAsState()
     Column(modifier = Modifier.fillMaxSize()) {
-        SimpleHeader("Register", onBack = { onBack() })
-
         Column(
             modifier = Modifier.padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
