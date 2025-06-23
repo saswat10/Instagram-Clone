@@ -30,6 +30,10 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        vectorDrawables{
+            useSupportLibrary = true
+        }
+
         buildConfigField(
             "String",
             "API_ENV_VARIABLE",

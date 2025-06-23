@@ -20,14 +20,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.saswat10.instagramclone.navigation.RootNavGraph
 import com.saswat10.instagramclone.ui.theme.InstagramCloneTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,6 +40,20 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Install the splash screen
+        val splashScreen = installSplashScreen()
+
+        // Keep the splash screen on-screen until your content is ready.
+        // For demonstration, we'll simulate some loading time.
+        // In a real app, you'd replace this with your actual initialization logic.
+        var keepOnScreen = true
+        splashScreen.setKeepOnScreenCondition { keepOnScreen }
+
+        // Simulate some loading
+        runBlocking {
+            delay(2000) // Simulate a 2-second loading time
+            keepOnScreen = false
+        }
         enableEdgeToEdge()
         setContent {
             // navigation

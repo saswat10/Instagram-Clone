@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.saswat10.instagramclone.R
 import com.saswat10.instagramclone.viewmodels.RegisterViewModel
 import com.saswat10.instagramclone.viewmodels.RegisterViewState
 
@@ -62,14 +63,7 @@ fun RegisterScreen(
 
             Text(
                 text = "JETGRAM",
-                style = MaterialTheme.typography.headlineLarge + TextStyle(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color.Cyan,
-                            Color.Yellow,
-                        )
-                    )
-                ),
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold
 
             )

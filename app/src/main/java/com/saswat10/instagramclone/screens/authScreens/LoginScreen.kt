@@ -77,14 +77,7 @@ fun LoginScreen(
 
             Text(
                 text = "JETGRAM",
-                style = MaterialTheme.typography.headlineLarge + TextStyle(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color.Cyan,
-                            Color.Yellow,
-                        )
-                    )
-                ),
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold
 
             )
@@ -140,7 +133,6 @@ fun LoginScreen(
 //                    Text((state as LoginViewState.Error).message)
 //                }
                 is LoginViewState.Success -> {
-                    Text("Success")
                     Timber.tag("Success").d((state as LoginViewState.Success).user?.uid)
                 }
 

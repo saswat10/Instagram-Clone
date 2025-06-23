@@ -20,6 +20,7 @@ data class User(
     data class UserPreview(
         val userId: String = "",
         val username: String = "",
+        val fullName: String = "",
         val profilePicUrl: String? = null
     )
 }

@@ -6,6 +6,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideIn
@@ -18,6 +20,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Message
+import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Face
@@ -42,6 +48,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -49,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.LinearGradient
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -59,15 +67,22 @@ import com.saswat10.instagramclone.navigation.ProfileScreen
 
 
 enum class Destinations(
-    val route: Any,
+    val route: String,
     val label: String,
-    val icon: ImageVector,
+    val selectIcon: ImageVector,
+    val unselectIcon: ImageVector,
     val contentDescription: String
 ) {
-    HOME(AllPostsScreen, "Home", Icons.Rounded.Home, "Home"),
-    CHAT(ChatScreen, "Chat", Icons.Rounded.QuestionAnswer, "Chat"),
-    NOTIFICATIONS(Notifications, "Notifications", Icons.Rounded.Notifications, "Notifications"),
-    PROFILE(ProfileScreen, "Profile", Icons.Rounded.Face, "Profile"),
+    HOME(AllPostsScreen::class.java.name, "Home", Icons.Rounded.Home, Icons.Outlined.Home, "Home"),
+    CHAT(ChatScreen::class.java.name, "Chat", Icons.Rounded.QuestionAnswer, Icons.Outlined.QuestionAnswer, "Chat"),
+    NOTIFICATIONS(
+        Notifications::class.java.name,
+        "Notifications",
+        Icons.Rounded.Notifications,
+        Icons.Outlined.Notifications,
+        "Notifications"
+    ),
+    PROFILE(ProfileScreen::class.java.name, "Profile", Icons.Rounded.Face, Icons.Outlined.Face, "Profile"),
 }
 
 @Composable
@@ -79,7 +94,8 @@ fun MainScreen(
 
     val navController = rememberNavController()
     val startDestination = Destinations.HOME.route
-    var selectedDestination by remember { mutableStateOf(startDestination) }
+    var selectedDestination by rememberSaveable { mutableStateOf(startDestination) }
+    var isVisible by rememberSaveable { mutableStateOf(true) }
 
 
     Scaffold(
@@ -87,9 +103,9 @@ fun MainScreen(
 //        containerColor = Color.Transparent,
         floatingActionButton = {
             AnimatedVisibility(
-                visible = (selectedDestination == Destinations.HOME.route),
-                enter = fadeIn(),
-                exit = fadeOut()
+                visible = isVisible,
+                enter = scaleIn(animationSpec = tween(500)),
+                exit = scaleOut(animationSpec = tween(500))
             )
             {
                 FloatingActionButton(
@@ -110,8 +126,9 @@ fun MainScreen(
                     NavigationBarItem(
                         selected = (selectedDestination == destination.route),
                         onClick = {
+                            isVisible = (Destinations.HOME.route == (destination.route))
                             navController.navigate(destination.route) {
-                                popUpTo(navController.graph.startDestinationId) {
+                                popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
                                 launchSingleTop = true
@@ -121,7 +138,7 @@ fun MainScreen(
                         },
                         icon = {
                             Icon(
-                                imageVector = destination.icon,
+                                imageVector = if (selectedDestination == destination.route) destination.selectIcon else destination.unselectIcon,
                                 contentDescription = destination.contentDescription,
                                 modifier = Modifier.size(26.dp)
                             )
@@ -130,10 +147,10 @@ fun MainScreen(
 //                            Text(destination.label)
 //                        },
                         colors = NavigationBarItemColors(
-                            selectedIconColor = MaterialTheme.colorScheme.onSecondary,
+                            selectedIconColor = MaterialTheme.colorScheme.surfaceTint,
                             selectedTextColor = MaterialTheme.colorScheme.primary,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            selectedIndicatorColor = MaterialTheme.colorScheme.secondary,
+                            unselectedIconColor = MaterialTheme.colorScheme.inversePrimary,
+                            selectedIndicatorColor = MaterialTheme.colorScheme.surface,
                             unselectedTextColor = MaterialTheme.colorScheme.surface,
                             disabledIconColor = MaterialTheme.colorScheme.surfaceDim,
                             disabledTextColor = MaterialTheme.colorScheme.surfaceDim,
