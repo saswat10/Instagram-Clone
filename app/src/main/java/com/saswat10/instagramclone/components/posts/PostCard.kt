@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,10 +15,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Comment
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.rounded.Comment
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -40,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.saswat10.instagramclone.R
 
 @Composable
-fun PostCard() {
+fun PostCard(onComment: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,11 +74,7 @@ fun PostCard() {
             }
 
         }
-        Image(
-            painter = painterResource(
-                id = R.drawable.img1
-            ), contentDescription = ""
-        )
+        MediaCarousel()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,8 +90,9 @@ fun PostCard() {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    imageVector = Icons.Default.ThumbUp,
+                    imageVector = Icons.Outlined.FavoriteBorder,
                     contentDescription = "Like",
+
                 )
                 Text(text = "100")
 
@@ -101,22 +105,32 @@ fun PostCard() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.ThumbUp,
-                    contentDescription = "Comment"
+                    imageVector = Icons.AutoMirrored.Rounded.Comment,
+                    contentDescription = "Comment",
+                    modifier = Modifier.clickable{
+                        onComment()
+                    }
                 )
 
                 Text(text = "100")
             }
-
+            Icon(
+                imageVector = Icons.Default.Bookmark,
+                contentDescription = "Comment",
+                modifier = Modifier.clickable{
+                    onComment()
+                }
+            )
         }
         Text(
             buildAnnotatedString {
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("saswat10 ")
+                    append("@saswat10 ")
                 }
                 append("This is My First Here on Instagram Clone, Hope everyone starts posting on this platform ver soon!!")
             },
-            modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp)
+            modifier = Modifier.padding(vertical = 5.dp, horizontal = 10.dp),
+            style = MaterialTheme.typography.labelLarge
         )
     }
 }

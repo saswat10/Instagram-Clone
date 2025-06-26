@@ -24,12 +24,14 @@ import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.QuestionAnswer
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.QuestionAnswer
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.twotone.Home
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -64,6 +66,7 @@ import com.saswat10.instagramclone.navigation.AllPostsScreen
 import com.saswat10.instagramclone.navigation.ChatScreen
 import com.saswat10.instagramclone.navigation.Notifications
 import com.saswat10.instagramclone.navigation.ProfileScreen
+import com.saswat10.instagramclone.navigation.SearchScreen
 
 
 enum class Destinations(
@@ -74,6 +77,7 @@ enum class Destinations(
     val contentDescription: String
 ) {
     HOME(AllPostsScreen::class.java.name, "Home", Icons.Rounded.Home, Icons.Outlined.Home, "Home"),
+    SEARCH(SearchScreen::class.java.name, "Search", Icons.Rounded.Search, Icons.Outlined.Search, "Search"),
     CHAT(ChatScreen::class.java.name, "Chat", Icons.Rounded.QuestionAnswer, Icons.Outlined.QuestionAnswer, "Chat"),
     NOTIFICATIONS(
         Notifications::class.java.name,
@@ -105,7 +109,7 @@ fun MainScreen(
             AnimatedVisibility(
                 visible = isVisible,
                 enter = scaleIn(animationSpec = tween(500)),
-                exit = scaleOut(animationSpec = tween(500))
+                exit = scaleOut(animationSpec = tween(500)),
             )
             {
                 FloatingActionButton(
@@ -120,7 +124,7 @@ fun MainScreen(
                 windowInsets = NavigationBarDefaults.windowInsets,
                 tonalElevation = 2.dp,
                 containerColor = Color.Transparent,
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface).padding(horizontal =  8.dp)
             ) {
                 Destinations.entries.forEachIndexed { index, destination ->
                     NavigationBarItem(
@@ -147,11 +151,12 @@ fun MainScreen(
 //                            Text(destination.label)
 //                        },
                         colors = NavigationBarItemColors(
-                            selectedIconColor = MaterialTheme.colorScheme.surfaceTint,
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
                             selectedTextColor = MaterialTheme.colorScheme.primary,
-                            unselectedIconColor = MaterialTheme.colorScheme.inversePrimary,
-                            selectedIndicatorColor = MaterialTheme.colorScheme.surface,
-                            unselectedTextColor = MaterialTheme.colorScheme.surface,
+                            unselectedIconColor = MaterialTheme.colorScheme.outline,
+                            selectedIndicatorColor = MaterialTheme.colorScheme.surfaceVariant,
+//                            selectedIndicatorColor = MaterialTheme.colorScheme.surface,
+                            unselectedTextColor = MaterialTheme.colorScheme.outline,
                             disabledIconColor = MaterialTheme.colorScheme.surfaceDim,
                             disabledTextColor = MaterialTheme.colorScheme.surfaceDim,
                         )
@@ -173,17 +178,18 @@ fun MainScreen(
             },
             popEnterTransition = {
                 fadeIn(animationSpec = tween(400)) + slideInHorizontally(
-                    initialOffsetX = { -it })
+                    initialOffsetX = { it })
             },
             popExitTransition = {
                 fadeOut(animationSpec = tween(400)) + slideOutHorizontally(
-                    targetOffsetX = { it })
+                    targetOffsetX = { -it })
             },
         ) {
             composable<AllPostsScreen> { AllPostsScreen({ updateProfile() }) }
             composable<ChatScreen> { ChatScreen() }
             composable<ProfileScreen> { ProfileScreen() }
             composable<Notifications> { NotificationsScreen() }
+            composable<SearchScreen> {SearchScreen()}
         }
     }
 }

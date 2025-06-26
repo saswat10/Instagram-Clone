@@ -1,5 +1,8 @@
 package com.saswat10.instagramclone.ui.theme
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+
 
 val primaryLight = Color(0xFF252525)
 val onPrimaryLight = Color(0xFFFFFFFF)
