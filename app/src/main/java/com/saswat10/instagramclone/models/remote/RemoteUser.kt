@@ -27,7 +27,7 @@ fun RemoteUser.toUser(): User {
         followerCount = this.followerCount,
         followingCount = this.followingCount,
         privateAccount = this.private,
-        profilePicUrl = this.profilePic,
+        profilePic = this.profilePic,
         followers = emptyList(),
         following = emptyList(),
         sentRequests = emptyList(),

@@ -1,20 +1,25 @@
 package com.saswat10.instagramclone.repository
 
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.saswat10.instagramclone.models.domain.User
 import com.saswat10.instagramclone.models.remote.RemoteUser
 import com.saswat10.instagramclone.models.remote.toUser
+import com.saswat10.instagramclone.utils.FirebaseConstants
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(private val firestore: FirebaseFirestore) {
+
+    private val userCollection = firestore.collection(FirebaseConstants.COLLECTION_USERS)
+
 
     /*
     * Create user
     * */
     suspend fun createUser(uid: String, user: RemoteUser): Result<String> {
         return try {
-            firestore.collection("users").document(uid).set(user).await()
+            userCollection.document(uid).set(user).await()
             Result.success("User created successfully")
         } catch (e: Exception) {
             Result.failure(e)
@@ -26,8 +31,23 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     * */
     suspend fun updateUser(uid: String, hasMap: HashMap<String, Any>): Result<String> {
         return try {
-            firestore.collection("users").document(uid).update(hasMap).await()
+            userCollection.document(uid).update(hasMap).await()
             Result.success("User updated successfully")
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Get All Users
+     */
+    suspend fun getAllUsers(): Result<List<User?>> {
+        return try {
+            val result = userCollection.get().await()
+            val users = result.documents.map {
+                it.toObject(RemoteUser::class.java)?.toUser()
+            }
+            Result.success(users)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -39,7 +59,7 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     * */
     suspend fun getUserByUid(uid: String): Result<User?> {
         return try {
-            val result = firestore.collection("users").document(uid).get().await()
+            val result = userCollection.document(uid).get().await()
             if (result.exists()) {
                 val remoteUser = result.toObject(RemoteUser::class.java)
                 val user = remoteUser?.toUser()
@@ -53,13 +73,15 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
         }
     }
 
+
     /*
     * Get Followers
     * */
     suspend fun getFollowers(uid: String): Result<List<User.UserPreview>> {
         return try {
             val documents =
-                firestore.collection("users").document(uid).collection("followers").get().await()
+                userCollection.document(uid).collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWERS)
+                    .get().await()
             val followers = documents.toObjects(User.UserPreview::class.java)
             Result.success(followers)
         } catch (e: Exception) {
@@ -73,7 +95,8 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     suspend fun getFollowing(uid: String): Result<List<User.UserPreview>> {
         return try {
             val documents =
-                firestore.collection("users").document(uid).collection("following").get().await()
+                userCollection.document(uid).collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWING)
+                    .get().await()
             val following = documents.toObjects(User.UserPreview::class.java)
             Result.success(following)
         } catch (e: Exception) {
@@ -82,15 +105,16 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     }
 
     /*
-    * Get PendingRequests
+    * Get PendingAccepts
     * */
     suspend fun getPendingRequests(uid: String): Result<List<User.UserPreview>> {
         return try {
             val documents =
-                firestore.collection("users").document(uid).collection("pending_requests").get()
+                userCollection.document(uid)
+                    .collection(FirebaseConstants.SUBCOLLECTIONS_PENDING_ACCEPTS).get()
                     .await()
-            val pendingRequests = documents.toObjects(User.UserPreview::class.java)
-            Result.success(pendingRequests)
+            val pendingAccepts = documents.toObjects(User.UserPreview::class.java)
+            Result.success(pendingAccepts)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -102,7 +126,8 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     suspend fun getSentRequests(uid: String): Result<List<User.UserPreview>> {
         return try {
             val documents =
-                firestore.collection("users").document(uid).collection("sent_requests").get()
+                userCollection.document(uid)
+                    .collection(FirebaseConstants.SUBCOLLECTIONS_SENT_REQUESTS).get()
                     .await()
             val sentRequests = documents.toObjects(User.UserPreview::class.java)
             Result.success(sentRequests)
@@ -110,4 +135,256 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
             Result.failure(e)
         }
     }
+
+    /*
+     * Follow User
+     */
+    suspend fun followUser(uid: String, targetUid: String): Result<Unit> {
+        return try {
+            firestore.runTransaction { transaction ->
+                val currentUserRef = userCollection.document(uid)
+                val targetUserRef = userCollection.document(targetUid)
+
+                val targetUserDoc = transaction.get(targetUserRef)
+                val targetUser = targetUserDoc.toObject(RemoteUser::class.java)
+                    ?: throw Exception("User not found")
+
+                val currentUserDoc = transaction.get(currentUserRef)
+                val currentUser = currentUserDoc.toObject(RemoteUser::class.java)
+                    ?: throw Exception("User not found")
+
+                if (targetUser.private) {
+                    val sentRequestData = User.UserPreview(
+                        targetUid,
+                        targetUser.username,
+                        targetUser.fullName,
+                        targetUser.profilePic
+                    )
+                    val pendingRequestData = User.UserPreview(
+                        uid,
+                        currentUser.username,
+                        currentUser.fullName,
+                        currentUser.profilePic
+                    )
+
+                    transaction.set(
+                        currentUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_SENT_REQUESTS)
+                            .document(targetUid),
+                        sentRequestData
+                    )
+                    transaction.set(
+                        targetUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_PENDING_ACCEPTS)
+                            .document(uid),
+                        pendingRequestData
+                    )
+                } else {
+                    // Public Account
+                    val followerData = User.UserPreview(
+                        uid,
+                        currentUser.username,
+                        currentUser.fullName,
+                        currentUser.profilePic
+                    )
+                    val followingData = User.UserPreview(
+                        targetUid,
+                        targetUser.username,
+                        targetUser.fullName,
+                        targetUser.profilePic
+                    )
+
+                    transaction.set(
+                        currentUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWING)
+                            .document(targetUid),
+                        followingData
+                    )
+                    transaction.set(
+                        targetUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWERS)
+                            .document(uid),
+                        followerData
+                    )
+
+                    // update the follower and following count
+                    transaction.update(
+                        currentUserRef,
+                        FirebaseConstants.FIELD_FOLLOWING,
+                        currentUser.followingCount + 1
+                    )
+                    transaction.update(
+                        targetUserRef,
+                        FirebaseConstants.FIELD_FOLLOWERS,
+                        targetUser.followerCount + 1
+                    )
+                }
+                Result.success(Unit)
+            }.await()
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Unfollow User
+     */
+    suspend fun unfollowUser(uid: String, targetUid: String): Result<Unit> {
+        return try {
+            firestore.runTransaction { transaction ->
+                val currentUserRef = userCollection.document(uid)
+                val targetUserRef = userCollection.document(targetUid)
+
+                // remove following list of current User
+                transaction.delete(
+                    currentUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWING)
+                        .document(targetUid)
+                )
+                transaction.update(
+                    currentUserRef,
+                    FirebaseConstants.FIELD_FOLLOWING,
+                    FieldValue.increment(-1)
+                )
+
+                // remove from followers list of target User
+                transaction.delete(
+                    targetUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWERS)
+                        .document(uid)
+                )
+                transaction.update(
+                    targetUserRef,
+                    FirebaseConstants.FIELD_FOLLOWERS,
+                    FieldValue.increment(-1)
+                )
+            }.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Accept Request
+     */
+    suspend fun acceptRequest(uid: String, targetUid: String): Result<Unit> {
+        return try {
+            firestore.runTransaction { transaction ->
+                val currentUserRef = userCollection.document(uid)
+                val targetUserRef = userCollection.document(targetUid)
+
+                val targetUserDoc = transaction.get(targetUserRef)
+                val targetUser = targetUserDoc.toObject(RemoteUser::class.java)
+                    ?: throw Exception("User not found")
+
+                val currentUserDoc = transaction.get(currentUserRef)
+                val currentUser = currentUserDoc.toObject(RemoteUser::class.java)
+                    ?: throw Exception("User not found")
+
+                val followerData = User.UserPreview(
+                    targetUid,
+                    targetUser.username,
+                    targetUser.fullName,
+                    targetUser.profilePic
+                )
+                val followingData = User.UserPreview(
+                    uid,
+                    currentUser.username,
+                    currentUser.fullName,
+                    currentUser.profilePic
+                )
+
+
+                // delete the sent requests from the target user
+                transaction.delete(
+                    targetUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_SENT_REQUESTS)
+                        .document(uid)
+                )
+                // add the current user to the following list of the target user
+                transaction.set(
+                    targetUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWING)
+                        .document(uid), followingData
+                )
+                // increment the following count for the target user
+                transaction.update(
+                    targetUserRef,
+                    FirebaseConstants.FIELD_FOLLOWING,
+                    FieldValue.increment(1)
+                )
+
+                // delete the pending accepts from the current user
+                transaction.delete(
+                    currentUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_PENDING_ACCEPTS)
+                        .document(uid)
+                )
+                // add the target user to the followers list of the current user
+                transaction.set(
+                    currentUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWERS)
+                        .document(uid), followerData
+                )
+                // increment the followers count of the current user
+                transaction.update(
+                    currentUserRef,
+                    FirebaseConstants.FIELD_FOLLOWERS,
+                    FieldValue.increment(1)
+                )
+            }.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Decline Request
+     */
+    suspend fun declineRequest(uid: String, targetUid: String): Result<Unit> {
+        return try {
+            firestore.runTransaction { transaction ->
+                val currentUserRef = userCollection.document(uid)
+                val targetUserRef = userCollection.document(targetUid)
+
+                // delete the pending accepts from the current user
+                transaction.delete(
+                    currentUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_PENDING_ACCEPTS)
+                        .document(targetUid)
+                )
+
+                // delete the sent requests from the target user
+                transaction.delete(
+                    targetUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_SENT_REQUESTS)
+                        .document(uid)
+                )
+            }.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Withdraw Follow Request
+     */
+    suspend fun withdrawFollowRequest(uid: String, targetUid: String): Result<Unit> {
+        return try {
+            firestore.runTransaction { transaction ->
+                val currentUserRef = userCollection.document(uid)
+                val targetUserRef = userCollection.document(targetUid)
+
+                // delete the sent requests from the current user
+                transaction.delete(
+                    currentUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_SENT_REQUESTS)
+                        .document(targetUid)
+                )
+
+                // delete the pending accepts from the target user
+                transaction.delete(
+                    targetUserRef.collection(FirebaseConstants.SUBCOLLECTIONS_PENDING_ACCEPTS)
+                        .document(uid)
+                )
+            }.await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Delete User - Should Also Delete the Posts, Comments, Remove from followers, following list, remove from everywhere.git
+     */
 }

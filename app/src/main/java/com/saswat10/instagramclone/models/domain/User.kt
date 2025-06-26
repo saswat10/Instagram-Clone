@@ -6,7 +6,7 @@ data class User(
     val username: String = "",
     val fullName: String = "",
     val bio: String = "",
-    val profilePicUrl: String? = null,
+    val profilePic: String? = null,
     val followerCount: Int = 0,
     val followingCount: Int = 0,
     val privateAccount: Boolean = false,
@@ -21,6 +21,6 @@ data class User(
         val userId: String = "",
         val username: String = "",
         val fullName: String = "",
-        val profilePicUrl: String? = null
+        val profilePic: String? = null
     )
 }
