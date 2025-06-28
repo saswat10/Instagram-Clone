@@ -1,17 +1,13 @@
 package com.saswat10.instagramclone.components.user
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,34 +15,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.saswat10.instagramclone.R
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
+import com.saswat10.instagramclone.models.domain.User
 
 @Composable
-fun ProfileCard() {
-    Column(modifier = Modifier
-        .fillMaxWidth()) {
+fun ProfileCard(user: User) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Todo -> replace with async image
-            Image(
-                painter = painterResource(R.drawable.profile),
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(user.profilePic)
+                    .listener(
+                        onStart = { println("Coil: Image loading started") },
+                        onSuccess = { request, result -> println("Coil: Image loaded successfully: ${request.data}") },
+                        onError = { request, result -> println("Coil: Image loading failed for ${request.data}: ${result.throwable?.message}") }
+                    )
+                    .build(),
+
                 contentDescription = "Profile Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(120.dp)
-                    .clip(shape = CircleShape)
+                    .clip(shape = CircleShape),
+                loading = {
+                    CircularProgressIndicator()
+                }
             )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    "10",
+                    "${user.posts}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -55,7 +64,7 @@ fun ProfileCard() {
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    "10K",
+                    "${user.followerCount}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -64,7 +73,7 @@ fun ProfileCard() {
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    "1.2K",
+                    "${user.followingCount}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -74,8 +83,8 @@ fun ProfileCard() {
 
         }
         Spacer(Modifier.size(10.dp))
-        Text("Kisuke Urahara", fontWeight = FontWeight.Bold)
-        Text("Owns a candy shop in the Karakura Town, Loves Cats 🥰🥰🥰😺")
+        Text(user.fullName, fontWeight = FontWeight.Bold)
+        Text(user.bio)
 
 
         // display the full name and the bio
@@ -84,15 +93,3 @@ fun ProfileCard() {
 
 }
 
-@Composable
-@Preview(showSystemUi = true, showBackground = true)
-fun PreviewProfileCard() {
-    Column(
-        modifier = Modifier
-            .systemBarsPadding()
-            .fillMaxSize()
-            .padding(10.dp)
-    ) {
-        ProfileCard()
-    }
-}

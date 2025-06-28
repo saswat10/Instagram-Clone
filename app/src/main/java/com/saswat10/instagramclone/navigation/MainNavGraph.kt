@@ -1,22 +1,16 @@
 package com.saswat10.instagramclone.navigation
 
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.createGraph
-import androidx.navigation.navigation
-import com.saswat10.instagramclone.screens.userScreens.AllPostsScreen
-import com.saswat10.instagramclone.screens.userScreens.ChatScreen
+import androidx.navigation.toRoute
 import com.saswat10.instagramclone.screens.userScreens.MainScreen
-import com.saswat10.instagramclone.screens.userScreens.ProfileScreen
-import com.saswat10.instagramclone.screens.userScreens.UpdateProfile
+import com.saswat10.instagramclone.screens.userScreens.UpdateProfileScreen
 import kotlinx.serialization.Serializable
 
 
 @Serializable
-data object UpdateProfile
+data class UpdateProfile(val navigateToDiscover: Boolean = false)
 
 @Serializable
 data object MainScreen
@@ -38,19 +32,32 @@ data object SearchScreen
 
 fun NavGraphBuilder.mainNavGraph(navController: NavHostController) {
     composable<UpdateProfile> {
-        UpdateProfile(
+        val args = it.toRoute<UpdateProfile>()
+        UpdateProfileScreen(
+            navigateToDiscover = args.navigateToDiscover,
             navigateToMainScreen = {
-                navController.navigate(MainScreen) {
-                    popUpTo(UpdateProfile) {
-                        inclusive = true
+                if (args.navigateToDiscover) {
+                    navController.navigate(MainScreen) {
+                        popUpTo(args) {
+                            inclusive = true
+                        }
                     }
                 }
+            },
+            onBack = {
+                navController.popBackStack()
             }
         )
     }
-    composable<MainScreen> { MainScreen(
-        updateProfile = {
-            navController.navigate(UpdateProfile)
-        }
-    ) }
+    composable<MainScreen> {
+        MainScreen(
+            updateProfile = {
+                navController.navigate(
+                    UpdateProfile(
+                        navigateToDiscover = false,
+                    )
+                )
+            }
+        )
+    }
 }

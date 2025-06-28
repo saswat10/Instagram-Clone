@@ -32,5 +32,6 @@ fun RemoteUser.toUser(): User {
         following = emptyList(),
         sentRequests = emptyList(),
         pendingRequests = emptyList(),
+        posts = posts
     )
 }

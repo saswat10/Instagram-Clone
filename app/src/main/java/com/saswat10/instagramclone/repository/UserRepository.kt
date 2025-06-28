@@ -120,7 +120,7 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
         }
     }
 
-    /*
+    /**
     * Get SentRequests
     * */
     suspend fun getSentRequests(uid: String): Result<List<User.UserPreview>> {
@@ -136,7 +136,7 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
         }
     }
 
-    /*
+    /**
      * Follow User
      */
     suspend fun followUser(uid: String, targetUid: String): Result<Unit> {

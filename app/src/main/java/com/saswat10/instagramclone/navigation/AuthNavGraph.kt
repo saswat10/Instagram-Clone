@@ -1,13 +1,9 @@
 package com.saswat10.instagramclone.navigation
 
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.createGraph
 import androidx.navigation.toRoute
-import com.saswat10.instagramclone.navigation.LoginScreen
 import com.saswat10.instagramclone.screens.authScreens.LoginScreen
 import com.saswat10.instagramclone.screens.authScreens.RegisterScreen
 import com.saswat10.instagramclone.screens.authScreens.ResetPassword
@@ -38,7 +34,7 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
     composable<RegisterScreen> {
         RegisterScreen(
             navigateToUpdate = {
-                navController.navigate(route = UpdateProfile)
+                navController.navigate(route = UpdateProfile(navigateToDiscover = true))
             },
             onBack = {
                 navController.popBackStack()

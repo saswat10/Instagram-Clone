@@ -7,6 +7,7 @@ data class User(
     val fullName: String = "",
     val bio: String = "",
     val profilePic: String? = null,
+    val posts: Int = 0,
     val followerCount: Int = 0,
     val followingCount: Int = 0,
     val privateAccount: Boolean = false,

@@ -44,14 +44,14 @@ fun ProfilePreview(userPreview: UserPreview) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                if (userPreview.profilePicUrl.isNullOrBlank()) Icon(
+                if (userPreview.profilePic.isNullOrBlank()) Icon(
                     imageVector = Icons.Rounded.AccountCircle,
                     contentDescription = "Profile Image",
                     modifier = Modifier.size(40.dp)
                 )
                 else
                     AsyncImage(
-                        model = userPreview.profilePicUrl,
+                        model = userPreview.profilePic,
                         contentDescription = "Profile Image"
                     )
                 Column() {
@@ -72,13 +72,3 @@ fun ProfilePreview(userPreview: UserPreview) {
 }
 
 
-@Composable
-@Preview(showSystemUi = true, showBackground = true)
-fun Preview() {
-    Column {
-        ProfilePreview(UserPreview(profilePicUrl = null, username = "saswat10", userId = "123", fullName = "Saswat Samal"))
-        ProfilePreview(UserPreview(profilePicUrl = null, username = "saswat10", userId = "123"))
-        ProfilePreview(UserPreview(profilePicUrl = null, username = "saswat10", userId = "123"))
-        ProfilePreview(UserPreview(profilePicUrl = null, username = "saswat10", userId = "123"))
-    }
-}

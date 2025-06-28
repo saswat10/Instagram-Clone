@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens.userScreens
+package com.saswat10.instagramclone.screens.searchScreens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

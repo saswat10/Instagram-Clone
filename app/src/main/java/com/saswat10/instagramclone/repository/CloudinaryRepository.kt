@@ -34,8 +34,13 @@ class CloudinaryRepository @Inject constructor(
                         requestId: String?,
                         resultData: Map<*, *>?
                     ) {
-                        val url = resultData?.get("url") as String
-                        onResult(Result.success(url))
+                        val originalUrl = resultData?.get("url") as? String
+                        if (originalUrl != null) {
+                            val secureUrl = ensureHttps(originalUrl)
+                            onResult(Result.success(secureUrl))
+                        } else {
+                            onResult(Result.failure(RuntimeException("Cloudinary URL not found in result data.")))
+                        }
                     }
 
                     override fun onError(
@@ -53,6 +58,18 @@ class CloudinaryRepository @Inject constructor(
                 }
             )
             .dispatch(context)
+    }
+
+
+    private fun ensureHttps(url: String): String {
+        return when {
+            url.startsWith("https://", ignoreCase = true) -> url
+            url.startsWith("http://", ignoreCase = true) -> url.replaceFirst("http://", "https://", ignoreCase = true)
+            // Handle URLs that might not have a scheme (e.g., //res.cloudinary.com/...)
+            url.startsWith("//") -> "https:$url"
+            // If it's a relative path or something else entirely, just prepend https://
+            else -> "https://$url"
+        }
     }
 
 }
