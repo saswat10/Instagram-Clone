@@ -1,10 +1,13 @@
 package com.saswat10.instagramclone.viewmodels
 
+import android.net.Uri
+import androidx.compose.material3.Snackbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.saswat10.instagramclone.SnackBarManager
 import com.saswat10.instagramclone.models.remote.RemoteUser
+import com.saswat10.instagramclone.repository.CloudinaryRepository
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
 import com.saswat10.instagramclone.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,53 +15,102 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
-
-sealed interface RegisterViewState {
-    data class Error(val message: String) : RegisterViewState
-    object Loading : RegisterViewState
-    data class Success(val user: FirebaseUser?) : RegisterViewState
-}
-
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val authRepository: FirebaseAuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val cloudinaryRepository: CloudinaryRepository
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow<RegisterViewState?>(null)
+    private val _viewState = MutableStateFlow(RegisterFormUiState())
     val viewState = _viewState.asStateFlow()
 
-    fun register(email: String, password: String, confirmPassword: String) {
+    fun registerAndCreate() {
+        _viewState.update { it.copy(uiState = UiState.Loading) }
         viewModelScope.launch {
-            if (email == "" || password == "" || confirmPassword == "") {
-                SnackBarManager.showMessage("Fields cannot be empty")
-            } else if (password != confirmPassword) {
-                SnackBarManager.showMessage("Password don't match")
-            } else {
-                _viewState.update { RegisterViewState.Loading }
-                authRepository.register(email, password)
-
-                    .onSuccess {
-                        _viewState.value = RegisterViewState.Success(it)
-                        userRepository.createUser(
-                            user = RemoteUser(email = it?.email.toString()),
-                            uid = it!!.uid
-                        ).onSuccess {
-                            Timber.tag("RegisterViewModel").d(it)
-//                            SnackBarManager.showMessage("User Registration Success")
-                        }.onFailure {
-//                            SnackBarManager.showMessage(it.localizedMessage ?: "Unknown error")
-                        }
+            // first register
+            authRepository.register(
+                email = viewState.value.email,
+                password = viewState.value.password
+            ).onSuccess { firebaseUser ->
+                // create user
+                val user = RemoteUser(
+                    uid = firebaseUser!!.uid,
+                    username = viewState.value.username,
+                    fullName = viewState.value.fullName,
+                    email = viewState.value.email
+                )
+                userRepository.createUser(uid = firebaseUser.uid, user = user).onSuccess {message ->
+                    _viewState.update {
+                        it.copy(
+                            uiState = UiState.Success(
+                                "User created successfully",
+                                firebaseUser
+                            )
+                        )
                     }
-                    .onFailure {
-                        _viewState.value =
-                            RegisterViewState.Error(it.localizedMessage ?: "Unknown error")
-                        SnackBarManager.showMessage(it.localizedMessage ?: "Unknown error")
-                    }
+                    SnackBarManager.showMessage("User Creation Success")
+                }.onFailure {error ->
+                    _viewState.update { it.copy(uiState = UiState.Error("Error creating user")) }
+                    SnackBarManager.showMessage(error.localizedMessage ?: "Unknown Error")
+                }
+            }.onFailure { error ->
+                _viewState.update { it.copy(uiState = UiState.Error("Error registering user")) }
+                SnackBarManager.showMessage(error.localizedMessage ?: "Unknown Error")
             }
+
         }
     }
+
+
+    fun onUsernameChange(username: String) {
+        _viewState.update {
+            it.copy(
+                username = username
+            )
+        }
+    }
+
+    fun onFullNameChange(fullName: String) {
+        _viewState.update {
+            it.copy(fullName = fullName)
+        }
+    }
+
+    fun onEmailChange(email: String) {
+        _viewState.update {
+            it.copy(email = email)
+        }
+    }
+
+    fun onPasswordChange(password: String) {
+        _viewState.update {
+            it.copy(password = password)
+        }
+    }
+
+    fun onConfirmPasswordChange(confirmPassword: String) {
+        _viewState.update {
+            it.copy(confirmPassword = confirmPassword)
+        }
+    }
+
+}
+
+data class RegisterFormUiState(
+    val username: String = "",
+    val fullName: String = "",
+    val email: String = "",
+    val password: String = "",
+    val confirmPassword: String = "",
+    val profilePicture: Uri? = null,
+    val uiState: UiState? = null
+)
+
+sealed interface UiState {
+    object Loading : UiState
+    data class Success(val message: String, val user: FirebaseUser?) : UiState
+    data class Error(val message: String) : UiState
 }

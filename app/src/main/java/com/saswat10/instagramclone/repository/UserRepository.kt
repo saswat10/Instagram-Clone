@@ -7,6 +7,7 @@ import com.saswat10.instagramclone.models.remote.RemoteUser
 import com.saswat10.instagramclone.models.remote.toUser
 import com.saswat10.instagramclone.utils.FirebaseConstants
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(private val firestore: FirebaseFirestore) {
@@ -19,6 +20,7 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     * */
     suspend fun createUser(uid: String, user: RemoteUser): Result<String> {
         return try {
+            Timber.d("$user")
             userCollection.document(uid).set(user).await()
             Result.success("User created successfully")
         } catch (e: Exception) {

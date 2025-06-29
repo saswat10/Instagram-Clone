@@ -198,7 +198,7 @@ class UpdateViewModel @Inject constructor(
                     }
                     _eventFlow.emit(
                         UpdateProfileEvent.ShowSnackbar(
-                            successMessage ?: "Profile updated successfully!"
+                            successMessage
                         )
                     )
                     _eventFlow.emit(UpdateProfileEvent.UpdateSuccess) // Trigger navigation

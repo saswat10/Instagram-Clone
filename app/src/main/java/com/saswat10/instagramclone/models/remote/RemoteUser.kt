@@ -14,7 +14,7 @@ data class RemoteUser(
     val followingCount: Int = 0,
     val private: Boolean = false,
     val posts: Int = 0,
-    val profilePic: String? = null
+    val profilePic: String = ""
 )
 
 fun RemoteUser.toUser(): User {

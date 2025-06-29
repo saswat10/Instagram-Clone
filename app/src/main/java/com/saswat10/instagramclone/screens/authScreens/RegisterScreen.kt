@@ -9,13 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,22 +23,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.saswat10.instagramclone.R
 import com.saswat10.instagramclone.viewmodels.RegisterViewModel
-import com.saswat10.instagramclone.viewmodels.RegisterViewState
 
 @Composable
 fun RegisterScreen(
@@ -48,9 +40,6 @@ fun RegisterScreen(
     onBack: (() -> Unit),
     navigateToUpdate: (() -> Unit)
 ) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var confirmPassword by rememberSaveable { mutableStateOf("") }
     var showPassword by rememberSaveable { mutableStateOf(false) }
     var showConfirmPassword by rememberSaveable { mutableStateOf(false) }
     val viewState by registerViewModel.viewState.collectAsState()
@@ -69,14 +58,26 @@ fun RegisterScreen(
             )
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = viewState.username,
+                onValueChange = registerViewModel::onUsernameChange,
+                label = { Text("Username") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = viewState.fullName,
+                onValueChange = registerViewModel::onFullNameChange,
+                label = { Text("Full Name") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = viewState.email,
+                onValueChange = registerViewModel::onEmailChange,
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = viewState.password,
+                onValueChange = registerViewModel::onPasswordChange,
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
@@ -90,8 +91,8 @@ fun RegisterScreen(
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
             )
             OutlinedTextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
+                value = viewState.confirmPassword,
+                onValueChange = registerViewModel::onConfirmPasswordChange,
                 label = { Text("Confirm Password") },
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
@@ -105,6 +106,8 @@ fun RegisterScreen(
                 visualTransformation = if (showConfirmPassword) VisualTransformation.None else PasswordVisualTransformation(),
             )
             Column(Modifier.fillMaxWidth()) {
+                val password = viewState.password
+                val confirmPassword = viewState.confirmPassword
                 AnimatedVisibility(password.isNotEmpty() && password.length < 8) {
                     Text(
                         "Password Length should be at least 8 characters",
@@ -154,57 +157,13 @@ fun RegisterScreen(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 Spacer(Modifier.width(5.dp))
                 Button(
-                    onClick = {
-                        registerViewModel.register(email, password, confirmPassword)
-                    },
-                    enabled = (email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && password == confirmPassword)
+                    onClick = registerViewModel::registerAndCreate,
+
                 ) {
-                    if (viewState == RegisterViewState.Loading) CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(
-                                20.dp
-                            )
-                            .fillMaxWidth(), color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    else Text("Sign In")
+                    Text("Sign In")
                 }
             }
-            when (viewState) {
-                is RegisterViewState.Loading -> {}
-                is RegisterViewState.Error -> {}
-                is RegisterViewState.Success -> {
-                    navigateToUpdate()
-                }
-
-                else -> {}
-            }
-
-
-//                Box() {
-//                    HorizontalDivider(modifier = Modifier.align(Alignment.Center))
-//                    Text(
-//                        "OR",
-//                        modifier = Modifier
-//                            .align(Alignment.Center)
-//                            .background(color = MaterialTheme.colorScheme.surface)
-//                            .padding(horizontal = 10.dp),
-//                        color = Color.Gray
-//                    )
-//                }
-//
-//                TextButton(onClick = {
-//                    Timber.tag("Forgot").d("")
-//                }) {
-//                    Image(
-//                        painter = painterResource(R.drawable.google),
-//                        contentDescription = null,
-//                        Modifier.size(20.dp)
-//                    )
-//                    Spacer(Modifier.width(10.dp))
-//                    Text("Sign Up With Google")
-//                }
 
         }
     }
-
 }
