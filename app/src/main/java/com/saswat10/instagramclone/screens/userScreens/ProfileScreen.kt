@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.saswat10.instagramclone.R
 import com.saswat10.instagramclone.components.common.SimpleHeader
-import com.saswat10.instagramclone.components.user.ProfileCard
+import com.saswat10.instagramclone.components.user.UserDetailCard
 import com.saswat10.instagramclone.viewmodels.UserViewModel
 import com.saswat10.instagramclone.viewmodels.UserViewState
 import timber.log.Timber
@@ -76,6 +76,7 @@ fun ProfileScreen(
 
         is UserViewState.Success -> {
             val user = (state as UserViewState.Success).user
+            Timber.d("User: $user")
 
             PullToRefreshBox(
                 isRefreshing = refreshState,
@@ -98,7 +99,7 @@ fun ProfileScreen(
                     item(span = { GridItemSpan(maxLineSpan) }) {
 
                         Column(modifier = Modifier.padding(16.dp)) {
-                            ProfileCard(user)
+                            UserDetailCard(user)
                             Spacer(modifier = Modifier.height(10.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),

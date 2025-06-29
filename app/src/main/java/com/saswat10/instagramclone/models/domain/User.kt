@@ -24,4 +24,14 @@ data class User(
         val fullName: String = "",
         val profilePic: String? = null
     )
+
+    fun getname(): String {
+        return if (username.length > 10) {
+            "@" + username.substring(0, 10) + "..."
+        } else if (username.isEmpty()) {
+            "no username"
+        } else {
+            "@$username"
+        }
+    }
 }

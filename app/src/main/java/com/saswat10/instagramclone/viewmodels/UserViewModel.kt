@@ -41,8 +41,8 @@ class UserViewModel @Inject constructor(
                     getUser(_uid)
                     getFollowers(_uid)
                     getFollowing(_uid)
-                    getPendingAccepts()
-                    getSentRequests()
+                    getPendingAccepts(_uid)
+                    getSentRequests(_uid)
                 } else {
                     _viewState.value =
                         UserViewState.Error(IllegalArgumentException("User is not logged in"))
@@ -200,7 +200,7 @@ class UserViewModel @Inject constructor(
                 _viewState.update { state ->
                     when (state) {
                         is UserViewState.Success -> {
-                            state.copy(user = state.user.copy(followers = sentRequests))
+                            state.copy(user = state.user.copy(sentRequests = sentRequests))
                         }
 
                         else -> {
