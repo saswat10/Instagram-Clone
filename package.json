@@ -1,0 +1,14 @@
+{
+  "name": "instagramclone",
+  "version": "1.0.0",
+  "description": "Instagram Clone with Firebase as the Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "saswat10",
+  "license": "ISC",
+  "devDependencies": {
+    "firebase-tools": "^14.9.0"
+  }
+}

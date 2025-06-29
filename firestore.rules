@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  	
+    function isAuthenticated(){
+    	return request.auth != null;
+    }
+
+    function isOwner(uid){
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // check if requesting user is following the target user
+    function isFollowing(targetUid){
+      return exists(/databases/$(database)/documents/users/$(targetUid)/followers/$(request.auth.uid));
+    }
+
+    // check if the requesting user previously sent the request to the target user
+    function hasSentRequest(targetUid){
+      return exists(/databases/$(database)/documents/users/$(targetUid)/pending_accepts/$(request.auth.uid));
+    }
+
+    // Check if the target account is private
+    function isPrivateAccount(targetUid){
+      return get(/databases/$(database)/documents/users/$(targetUid)).data.private == true;
+    }
+
+  
+  	match /users/{uid} {
+    	allow read: if isOwner(uid) || isAuthenticated();
+    	allow create: if isOwner(uid) && 
+                  request.resource.data.keys().hasOnly(['username', 'fullName', 'bio', 'private', 'profilePic']) &&
+                  request.resource.data.username is string && request.resource.data.username.size() > 0 &&
+                  request.resource.data.fullName is string && request.resource.data.fullName.size() > 0 &&
+                  request.resource.data.bio is string && request.resource.data.bio.size() > 0 &&
+                  request.resource.data.followerCount == 0 &&
+                  request.resource.data.followingCount == 0 &&
+                  request.resource.data.private is boolean &&
+                  request.resource.data.posts == 0 &&
+                  request.resource.data.profilePic is string;
+      allow update: if isOwner(uid) && 
+                  request.resource.data.username is string && request.resource.data.username.size() > 0 &&
+                  request.resource.data.fullName is string && request.resource.data.fullName.size() > 0 &&
+                  request.resource.data.bio is string && request.resource.data.bio.size() > 0 &&
+                  request.resource.data.private is boolean &&
+                  request.resource.data.profilePic is string &&
+                  request.resource.data.followerCount == resource.data.followerCount && // Must not change
+                  request.resource.data.followingCount == resource.data.followingCount && // Must not change
+                  request.resource.data.posts == resource.data.posts; // Must not change
+      allow delete: if isOwner(uid);
+
+      match /followers/{followerId} {
+        allow read: if isAuthenticated();
+        allow write: if isOwner(uid);
+      }
+      match /following/{followingId} {
+        allow read: if isAuthenticated();
+        allow write: if isOwner(uid);
+      }
+      match /sent_requests/{recipientId} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) && 
+                      uid != recipientId &&
+                      !isFollowing(recipientId) &&
+                      isPrivateAccount(recipientId) &&
+                      !hasSentRequest(recipientId);
+        allow delete: if isOwner(uid); 
+        allow update: false;
+      }
+      match /pending_accepts/{sender_id} {
+        allow read: if isOwner(uid);
+        allow update: if isOwner(uid);
+        allow delete: if isOwner(uid);
+        allow create: false;
+      }
+    }			
+  }
+}
