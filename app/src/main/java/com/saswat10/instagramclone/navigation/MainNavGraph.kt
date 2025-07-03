@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.saswat10.instagramclone.screens.postScreens.WritePostScreen
 import com.saswat10.instagramclone.screens.userScreens.MainScreen
 import com.saswat10.instagramclone.screens.userScreens.UpdateProfileScreen
 import kotlinx.serialization.Serializable
@@ -29,6 +30,9 @@ data object Notifications
 
 @Serializable
 data object SearchScreen
+
+@Serializable
+data object WritePost
 
 fun NavGraphBuilder.mainNavGraph(navController: NavHostController) {
     composable<UpdateProfile> {
@@ -57,7 +61,15 @@ fun NavGraphBuilder.mainNavGraph(navController: NavHostController) {
                         navigateToDiscover = false,
                     )
                 )
+            },
+            navigateWritePost = {
+                navController.navigate(
+                    WritePost
+                )
             }
         )
+    }
+    composable<WritePost> {
+        WritePostScreen()
     }
 }

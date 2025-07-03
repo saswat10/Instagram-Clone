@@ -77,7 +77,8 @@ enum class Destinations(
 
 @Composable
 fun MainScreen(
-    updateProfile: (() -> Unit)
+    updateProfile: (() -> Unit),
+    navigateWritePost: (() -> Unit)
 ) {
 
     val navController = rememberNavController()
@@ -98,7 +99,7 @@ fun MainScreen(
             {
                 FloatingActionButton(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    onClick = {},
+                    onClick = {navigateWritePost()},
                     content = { Icon(imageVector = Icons.Rounded.Add, contentDescription = null) })
             }
 

@@ -74,6 +74,37 @@ service cloud.firestore {
         allow delete: if isOwner(uid);
         allow create: if false;
       }
-    }			
+    }		
+
+    match /posts/{pid} {
+      allow read: if isAuthenticated() &&
+                  (!isPrivateAccount(resource.data.uid) || isOwner(resource.data.uid) ||           
+                  isFollowing(resource.data.uid));
+      allow create: if request.resource.data.uid == request.auth.uid &&
+                    request.resource.data.keys().hasOnly(['uid', 'username', 'profilePic', 'timestamp', 'caption', 'likes', 'comments', 'media']) &&
+                    request.resource.data.uid is string &&
+                    request.resource.data.username is string &&
+                    request.resource.data.profilePic is string &&
+                    request.resource.data.timestamp is timestamp &&
+                    request.resource.data.caption is string &&
+                    request.resource.data.likes is int && request.resource.data.likes == 0 &&
+                    request.resource.data.media is list &&
+                    request.resource.data.comments is int && request.resource.data.comments == 0;
+      allow update: if request.resource.data.uid == request.auth.uid &&
+                    request.resource.data.likes == resource.data.likes &&
+                    request.resource.data.comments == resource.data.comments;
+      allow delete: if request.resource.data.uid == request.auth.uid;
+
+      match /comments/{cid} {
+        allow read: if isAuthenticated();
+        allow write: if request.resource.data.uid == request.auth.uid;
+      }
+
+      match /likes/{uid} {  
+        allow read: if isAuthenticated();
+        allow write: if request.resource.data.uid == request.auth.uid;
+      }     
+
+    }	
   }
 }

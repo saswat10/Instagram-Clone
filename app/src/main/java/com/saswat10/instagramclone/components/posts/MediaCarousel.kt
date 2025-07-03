@@ -1,5 +1,6 @@
 package com.saswat10.instagramclone.components.posts
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -27,11 +28,18 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.saswat10.instagramclone.R
 
 data class Media(
     val id: String,
     val url: Int, // change this when using for cloud images/video
+    val type: MediaType
+    // add content description
+)
+data class MediaUri(
+    val id: String,
+    val url: Uri, // change this when using for cloud images/video
     val type: MediaType
     // add content description
 )
@@ -52,7 +60,7 @@ val mediaList = listOf<Media>(
 )
 
 @Composable
-fun MediaCarousel() {
+fun MediaCarousel(mediaList: List<MediaUri> = emptyList()) {
     val pagerState = rememberPagerState(
         pageCount = {
             mediaList.size
@@ -63,8 +71,8 @@ fun MediaCarousel() {
     HorizontalPager(state = pagerState, Modifier.fillMaxWidth()) { page ->
         val media = mediaList[page]
         Box() {
-            Image(
-                painter = painterResource(media.url),
+            AsyncImage(
+                model = media.url,
                 contentDescription = null,
                 modifier = Modifier
                     .height(300.dp)
