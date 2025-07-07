@@ -6,6 +6,9 @@ import com.saswat10.instagramclone.models.domain.User
 import com.saswat10.instagramclone.models.remote.RemoteUser
 import com.saswat10.instagramclone.models.remote.toUser
 import com.saswat10.instagramclone.utils.FirebaseConstants
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import javax.inject.Inject
@@ -52,6 +55,31 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
             Result.success(users)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    fun getAllUsersFlow(): Flow<Result<List<User?>>> = callbackFlow{
+        val registration = userCollection
+            .addSnapshotListener { snapshot, e ->
+                if(e != null){
+                    Timber.e(e, "Listener failed")
+                    trySend(Result.failure(e))
+                    return@addSnapshotListener
+                }
+
+                if(snapshot != null){
+                    val users = snapshot.documents.mapNotNull { documentSnapshot ->
+                        documentSnapshot.toObject(RemoteUser::class.java)?.toUser()
+                    }
+                    trySend(Result.success(users))
+                }else{
+                    trySend(Result.success(emptyList()))
+                }
+            }
+
+        awaitClose {
+            registration.remove()
+            Timber.d("Firestore snapshot listener removed for all users")
         }
     }
 

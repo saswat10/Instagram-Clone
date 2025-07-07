@@ -10,10 +10,14 @@ import com.saswat10.instagramclone.repository.FirebaseAuthRepository
 import com.saswat10.instagramclone.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.emptyList
 
 sealed interface UserViewState {
     object Loading : UserViewState
@@ -25,13 +29,18 @@ sealed interface UserViewState {
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val cloudinaryRepository: CloudinaryRepository,
     private val authRepository: FirebaseAuthRepository
 ) : ViewModel() {
     private val _viewState = MutableStateFlow<UserViewState>(UserViewState.Loading)
     private var _uid = ""
     var imageUrl: String? = null
     val viewState = _viewState.asStateFlow()
+
+    val usersFlow = userRepository.getAllUsersFlow().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = emptyList<List<User?>>()
+    )
 
     init {
         viewModelScope.launch {
@@ -71,21 +80,6 @@ class UserViewModel @Inject constructor(
                  _viewState.value = UserViewState.Error(it)
              }
          }
-    }
-
-    fun uploadImage(imageFile: Uri, onResult: (String?) -> Unit) {
-        _viewState.update{  UserViewState.Loading }
-        cloudinaryRepository.uploadImage(imageFile, "profile_images") { result ->
-            result.onSuccess { it ->
-                imageUrl = it
-                onResult(it)
-            }.onFailure {
-                _viewState.value =
-                    UserViewState.Error(Error(it.localizedMessage ?: "Unknown error"))
-                onResult(null)
-            }
-
-        }
     }
 
     fun updateUser(hashMap: HashMap<String, Any>) {
