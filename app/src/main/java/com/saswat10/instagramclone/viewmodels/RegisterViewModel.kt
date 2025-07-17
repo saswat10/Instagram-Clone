@@ -1,15 +1,14 @@
 package com.saswat10.instagramclone.viewmodels
 
 import android.net.Uri
-import androidx.compose.material3.Snackbar
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
-import com.saswat10.instagramclone.SnackBarManager
 import com.saswat10.instagramclone.models.remote.RemoteUser
 import com.saswat10.instagramclone.repository.CloudinaryRepository
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
 import com.saswat10.instagramclone.repository.UserRepository
+import com.saswat10.instagramclone.utils.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

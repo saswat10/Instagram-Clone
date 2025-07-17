@@ -1,7 +1,7 @@
 package com.saswat10.instagramclone.utils
 
 object FirebaseConstants {
-
+    
     // collections
     const val COLLECTION_USERS = "users"
     const val COLLECTION_POSTS = "posts"

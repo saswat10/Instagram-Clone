@@ -2,8 +2,8 @@ package com.saswat10.instagramclone.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.saswat10.instagramclone.SnackBarManager
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
+import com.saswat10.instagramclone.utils.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

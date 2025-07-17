@@ -66,7 +66,6 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
                     trySend(Result.failure(e))
                     return@addSnapshotListener
                 }
-
                 if(snapshot != null){
                     val users = snapshot.documents.mapNotNull { documentSnapshot ->
                         documentSnapshot.toObject(RemoteUser::class.java)?.toUser()
