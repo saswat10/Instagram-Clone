@@ -13,7 +13,6 @@ object FirebaseConstants {
      */
     // user doc fields
     const val FIELD_USERNAME = "username"
-    const val FIELD_EMAIL = "email"
     const val FIELD_FULL_NAME = "fullName"
     const val FIELD_BIO = "bio"
     const val FIELD_FOLLOWERS = "followerCount"
