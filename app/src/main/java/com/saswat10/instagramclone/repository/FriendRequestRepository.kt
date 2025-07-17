@@ -1,5 +1,6 @@
 package com.saswat10.instagramclone.repository
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -21,15 +22,15 @@ import javax.inject.Inject
 
 class FriendRequestRepository @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val firebaseAuthRepository: FirebaseAuthRepository
+    private val auth: FirebaseAuth,
 ) {
 
     private val friendsCollection =
         firestore.collection(FirebaseConstantsV2.Friends.COLLECTION_FRIENDS)
     private val requestsCollection =
         firestore.collection(FirebaseConstantsV2.Requests.COLLECTION_REQUESTS)
-    private var currentUser = firebaseAuthRepository.currentUser!!
     private val userCollection = firestore.collection(FirebaseConstantsV2.Users.COLLECTION_USERS)
+    private val currentUser = auth.currentUser
 
     /*
     1. Send Request
@@ -161,28 +162,31 @@ class FriendRequestRepository @Inject constructor(
     fun getFriendsFlowPaginated(
         limit: Long = 10, lastDocumentSnapshot: DocumentSnapshot? = null
     ): Flow<Result<Pair<List<RemoteFriends>, DocumentSnapshot?>>> {
-        val currentUserUid = currentUser.uid
-        return flow {
-            var query = friendsCollection.whereArrayContains(
-                FirebaseConstantsV2.Friends.FIELD_USER_IDS, currentUserUid
-            ).orderBy(FirebaseConstantsV2.Friends.CREATED_AT, Query.Direction.DESCENDING)
-                .limit(limit)
+        if (currentUser != null) {
+            return flow {
+                var query = friendsCollection.whereArrayContains(
+                    FirebaseConstantsV2.Friends.FIELD_USER_IDS, currentUser.uid
+                ).orderBy(FirebaseConstantsV2.Friends.CREATED_AT, Query.Direction.DESCENDING)
+                    .limit(limit)
 
-            if (lastDocumentSnapshot != null) {
-                query = query.startAfter(lastDocumentSnapshot)
-            }
-
-            query.snapshots().map { snapshots ->
-                val friendsList = snapshots.documents.mapNotNull { docSnap ->
-                    docSnap.toObject(RemoteFriends::class.java)
+                if (lastDocumentSnapshot != null) {
+                    query = query.startAfter(lastDocumentSnapshot)
                 }
-                val newLastDoc = snapshots.documents.lastOrNull()
-                Result.success(Pair(friendsList, newLastDoc))
-            }.catch {
-                emit(Result.failure(it))
-            }.collect {
-                emit(it)
+
+                query.snapshots().map { snapshots ->
+                    val friendsList = snapshots.documents.mapNotNull { docSnap ->
+                        docSnap.toObject(RemoteFriends::class.java)
+                    }
+                    val newLastDoc = snapshots.documents.lastOrNull()
+                    Result.success(Pair(friendsList, newLastDoc))
+                }.catch {
+                    emit(Result.failure(it))
+                }.collect {
+                    emit(it)
+                }
             }
+        } else {
+            throw IllegalStateException("Current user is null")
         }
     }
 
@@ -194,74 +198,93 @@ class FriendRequestRepository @Inject constructor(
         type: String, limit: Long = 10, lastDocumentSnapshot: DocumentSnapshot? = null
     ): Flow<Result<Pair<List<RemoteRequests?>, DocumentSnapshot?>>> {
 
-        val currentUserId = currentUser.uid
-        return flow {
-            var query = requestsCollection.whereEqualTo(type, currentUserId).whereEqualTo(
-                FirebaseConstantsV2.Requests.FIELD_STATUS, Constants.Status.PENDING
-            ).orderBy(
-                FirebaseConstantsV2.Requests.FIELD_CREATED_AT, Query.Direction.DESCENDING
-            ).limit(limit)
+        if (currentUser != null) {
+            return flow {
+                var query = requestsCollection.whereEqualTo(type, currentUser.uid).whereEqualTo(
+                    FirebaseConstantsV2.Requests.FIELD_STATUS, Constants.Status.PENDING
+                ).orderBy(
+                    FirebaseConstantsV2.Requests.FIELD_CREATED_AT, Query.Direction.DESCENDING
+                ).limit(limit)
 
-            if (lastDocumentSnapshot != null) {
-                query = query.startAfter(lastDocumentSnapshot)
-            }
-
-            query.snapshots().mapNotNull { snapshots ->
-                val requests = snapshots.documents.map { docSnap ->
-                    docSnap.toObject(RemoteRequests::class.java)
+                if (lastDocumentSnapshot != null) {
+                    query = query.startAfter(lastDocumentSnapshot)
                 }
-                val newLastDoc = snapshots.documents.lastOrNull()
-                Result.success(Pair(requests, newLastDoc))
-            }.catch {
-                emit(Result.failure(it))
-            }.collect {
-                emit(it)
+
+                query.snapshots().map { snapshots ->
+                    val requests = snapshots.documents.mapNotNull { docSnap ->
+                        docSnap.toObject(RemoteRequests::class.java)
+                    }
+                    val newLastDoc = snapshots.documents.lastOrNull()
+                    Result.success(Pair(requests, newLastDoc))
+                }.catch {
+                    emit(Result.failure(it))
+                }.collect {
+                    emit(it)
+                }
             }
+        } else {
+            throw IllegalStateException("Current user is null")
         }
     }
 
 
-    fun checkFriend(targetId: String): Flow<Result<Boolean>> = flow {
-        friendsCollection.whereArrayContains(
-            FirebaseConstantsV2.Friends.FIELD_USER_IDS, targetId
-        ).whereArrayContains(FirebaseConstantsV2.Friends.FIELD_USER_IDS, currentUser.uid).limit(1)
-            .snapshots().map {
-                Result.success(it.documents.isNotEmpty())
-            }.catch {
-                emit(Result.failure(it))
-            }.collect {
-                emit(it)
+    fun checkFriend(targetId: String): Flow<Result<Boolean>> {
+        if (currentUser == null) throw IllegalStateException("Current user is null")
+        else {
+            return flow {
+                friendsCollection.whereArrayContains(
+                    FirebaseConstantsV2.Friends.FIELD_USER_IDS, targetId
+                ).whereArrayContains(FirebaseConstantsV2.Friends.FIELD_USER_IDS, currentUser.uid)
+                    .limit(1)
+                    .snapshots().map {
+                        Result.success(it.documents.isNotEmpty())
+                    }.catch {
+                        emit(Result.failure(it))
+                    }.collect {
+                        emit(it)
+                    }
             }
+        }
     }
 
-    fun checkPendingRequest(targetId: String): Flow<Result<Boolean>> = flow {
-        requestsCollection.whereEqualTo(
-            FirebaseConstantsV2.Requests.FIELD_SENDER, targetId
-        ).whereEqualTo(
-            FirebaseConstantsV2.Requests.FIELD_RECEIVER, currentUser.uid
-        ).whereEqualTo(FirebaseConstantsV2.Requests.FIELD_STATUS, Constants.Status.PENDING).limit(1)
-            .snapshots().map {
-                Result.success(it.documents.isNotEmpty())
-            }.catch {
-                emit(Result.failure(it))
-            }.collect {
-                emit(it)
+    fun checkPendingRequest(targetId: String): Flow<Result<Boolean>> {
+        if (currentUser == null) throw IllegalStateException("Current user is null") else {
+            return flow {
+                requestsCollection.whereEqualTo(
+                    FirebaseConstantsV2.Requests.FIELD_SENDER, targetId
+                ).whereEqualTo(
+                    FirebaseConstantsV2.Requests.FIELD_RECEIVER, currentUser.uid
+                ).whereEqualTo(FirebaseConstantsV2.Requests.FIELD_STATUS, Constants.Status.PENDING)
+                    .limit(1)
+                    .snapshots().map {
+                        Result.success(it.documents.isNotEmpty())
+                    }.catch {
+                        emit(Result.failure(it))
+                    }.collect {
+                        emit(it)
+                    }
             }
+        }
     }
 
-    fun checkSentRequest(targetId: String): Flow<Result<Boolean>> = flow {
-        requestsCollection.whereEqualTo(
-            FirebaseConstantsV2.Requests.FIELD_RECEIVER, targetId
-        ).whereEqualTo(
-            FirebaseConstantsV2.Requests.FIELD_SENDER, currentUser.uid
-        ).whereEqualTo(FirebaseConstantsV2.Requests.FIELD_STATUS, Constants.Status.PENDING).limit(1)
-            .snapshots().map {
-                Result.success(it.documents.isNotEmpty())
-            }.catch {
-                emit(Result.failure(it))
-            }.collect {
-                emit(it)
+    fun checkSentRequest(targetId: String): Flow<Result<Boolean>> {
+        if (currentUser == null) throw IllegalStateException("Current user is null") else {
+            return flow {
+                requestsCollection.whereEqualTo(
+                    FirebaseConstantsV2.Requests.FIELD_RECEIVER, targetId
+                ).whereEqualTo(
+                    FirebaseConstantsV2.Requests.FIELD_SENDER, currentUser.uid
+                ).whereEqualTo(FirebaseConstantsV2.Requests.FIELD_STATUS, Constants.Status.PENDING)
+                    .limit(1)
+                    .snapshots().map {
+                        Result.success(it.documents.isNotEmpty())
+                    }.catch {
+                        emit(Result.failure(it))
+                    }.collect {
+                        emit(it)
+                    }
             }
+        }
     }
 
     fun getRelationshipStatus(targetId: String): Flow<Result<RelationshipStatus>> {
