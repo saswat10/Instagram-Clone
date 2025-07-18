@@ -8,6 +8,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
+    id("com.google.protobuf")
 }
 
 val localProperties = Properties()
@@ -132,6 +133,11 @@ dependencies {
     implementation("androidx.media3:media3-ui:1.7.1")
     implementation("androidx.media3:media3-ui-compose:1.7.1")
 
+    implementation("androidx.datastore:datastore:1.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("com.google.protobuf:protobuf-javalite:3.25.1")
+    implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.1")
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -142,3 +148,21 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 }
 
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.25.1"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java"){
+                    option("lite")
+                }
+                create("kotlin"){
+                    option("lite")
+                }
+            }
+        }
+    }
+}

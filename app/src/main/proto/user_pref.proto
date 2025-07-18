@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option java_package = "com.saswat10.instagramclone.datastore";
+option java_multiple_files = true;
+
+message UserPreferences{
+  string name = 1;
+  string username = 2;
+  string uid = 3;
+  string profilePic = 4;
+}
