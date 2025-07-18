@@ -1,9 +1,16 @@
 package com.saswat10.instagramclone.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.snapshots
 import com.saswat10.instagramclone.models.remote.RemoteUserV2
 import com.saswat10.instagramclone.utils.FirebaseConstantsV2
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -69,6 +76,34 @@ class UserV2Repository @Inject constructor(
             }
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    fun getUsersPaginated(
+        limit: Long = 10,
+        lastDocumentSnapshot: DocumentSnapshot? = null
+    ): Flow<Result<Pair<List<RemoteUserV2?>, DocumentSnapshot?>>> {
+        return flow {
+            var query = userCollection
+                .orderBy(FirebaseConstantsV2.Common.CREATED_AT, Query.Direction.DESCENDING)
+                .limit(limit)
+
+            if (lastDocumentSnapshot != null) {
+                query = query.startAfter(lastDocumentSnapshot)
+            }
+
+            query.snapshots().map { snapshots ->
+                val users = snapshots.documents.mapNotNull { docSnap ->
+                    docSnap.toObject(RemoteUserV2::class.java)
+                }
+                val newLastDoc = snapshots.documents.lastOrNull()
+                Result.success(Pair(users, newLastDoc))
+            }.catch {
+                emit(Result.failure(it))
+            }.collect {
+                emit(it)
+            }
+
         }
     }
 

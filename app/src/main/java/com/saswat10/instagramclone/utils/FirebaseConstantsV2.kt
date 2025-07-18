@@ -2,6 +2,10 @@ package com.saswat10.instagramclone.utils
 
 class FirebaseConstantsV2 {
 
+    object Common {
+        const val ID = "id"
+        const val CREATED_AT = "createdAt"
+    }
     object Users {
         const val COLLECTION_USERS = "users"
         const val ID = "id"
