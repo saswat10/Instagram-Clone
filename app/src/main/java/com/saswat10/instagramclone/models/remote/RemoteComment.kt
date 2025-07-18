@@ -2,6 +2,7 @@ package com.saswat10.instagramclone.models.remote
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.ServerTimestamp
 
 data class RemoteComment(
@@ -11,4 +12,15 @@ data class RemoteComment(
     val profilePic: String =  "",
     val content: String = "",
     @ServerTimestamp val createdAt: Timestamp? = null
-)
+){
+    @Exclude
+    fun toMap(): Map<String, Any?> {
+        return mapOf(
+            "userId" to userId,
+            "username" to username,
+            "profilePic" to profilePic,
+            "content" to content,
+            "createdAt" to createdAt
+        )
+    }
+}

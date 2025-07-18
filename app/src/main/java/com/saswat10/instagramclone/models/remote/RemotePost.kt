@@ -2,6 +2,7 @@ package com.saswat10.instagramclone.models.remote
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
 
@@ -21,4 +22,18 @@ data class RemotePost(
         val url: String = "",
         val type: String = ""
     )
+
+    @Exclude
+    fun toMap(): Map<String, Any?>{
+        return mapOf(
+            "username" to username,
+            "userId" to userId,
+            "profilePic" to profilePic,
+            "caption" to caption,
+            "media" to media,
+            "likesCount" to likesCount,
+            "commentsCount" to commentsCount,
+            "createdAt" to createdAt
+        )
+    }
 }

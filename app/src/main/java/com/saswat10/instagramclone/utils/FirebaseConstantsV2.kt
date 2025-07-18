@@ -39,6 +39,8 @@ class FirebaseConstantsV2 {
         const val FIELD_USER_ID = "userId"
         const val FIELD_CREATED_AT = "createdAt"
         const val FIELD_UPDATED_AT = "updatedAt"
+        const val FIELD_LIKES_COUNT = "likesCount"
+        const val FIELD_COMMENTS_COUNT = "commentsCount"
 
         const val SUBCOLLECTION_COMMENTS = "comments"
         const val SUBCOLLECTION_LIKES = "likes"
