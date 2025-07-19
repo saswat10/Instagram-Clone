@@ -29,7 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.saswat10.instagramclone.components.posts.MediaCarousel2
 import com.saswat10.instagramclone.components.posts.PostCard
+import com.saswat10.instagramclone.components.posts.mediaList
+import com.saswat10.instagramclone.components.posts.mediaList2
+import com.saswat10.instagramclone.components.posts.mediaList3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,9 +49,9 @@ fun AllPostsScreen(updateProfile: () -> Unit) {
 
         LazyColumn {
             item {
-                PostCard(onComment = { showBottomSheet = true })
-                PostCard(onComment = { showBottomSheet = true })
-                PostCard(onComment = { showBottomSheet = true })
+                PostCard(onComment = { showBottomSheet = true }, mediaList)
+                PostCard(onComment = { showBottomSheet = true }, mediaList2)
+                PostCard(onComment = { showBottomSheet = true }, mediaList3)
                 Spacer(modifier = Modifier.height(200.dp))
             }
         }

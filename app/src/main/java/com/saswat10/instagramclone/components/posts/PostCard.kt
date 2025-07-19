@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.saswat10.instagramclone.R
 
 @Composable
-fun PostCard(onComment: () -> Unit = {}) {
+fun PostCard(onComment: () -> Unit = {}, mediaList: List<Media>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -74,7 +74,7 @@ fun PostCard(onComment: () -> Unit = {}) {
             }
 
         }
-        MediaCarousel()
+        MediaCarousel2(mediaList)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -136,15 +136,15 @@ fun PostCard(onComment: () -> Unit = {}) {
 }
 
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PostCardPreview() {
-    Scaffold {
-        Column(modifier = Modifier.padding(it)) {
-            PostCard()
-            PostCard()
-        }
-
-    }
-
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun PostCardPreview() {
+//    Scaffold {
+//        Column(modifier = Modifier.padding(it)) {
+//            PostCard(medialist = mediaList)
+//            PostCard(mediaList)
+//        }
+//
+//    }
+//
+//}
