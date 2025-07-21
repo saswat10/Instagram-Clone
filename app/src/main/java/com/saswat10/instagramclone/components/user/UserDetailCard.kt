@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
-import com.saswat10.instagramclone.models.domain.User
+import com.saswat10.instagramclone.domain.models.User
 
 @Composable
 fun UserDetailCard(user: User) {

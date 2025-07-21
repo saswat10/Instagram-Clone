@@ -2,7 +2,7 @@ package com.saswat10.instagramclone.repository
 
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.saswat10.instagramclone.models.domain.User
+import com.saswat10.instagramclone.domain.models.User
 import com.saswat10.instagramclone.models.remote.RemoteUser
 import com.saswat10.instagramclone.models.remote.toUser
 import com.saswat10.instagramclone.utils.FirebaseConstants

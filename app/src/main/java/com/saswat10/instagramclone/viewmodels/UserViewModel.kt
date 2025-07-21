@@ -2,7 +2,7 @@ package com.saswat10.instagramclone.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.saswat10.instagramclone.models.domain.User
+import com.saswat10.instagramclone.domain.models.User
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
 import com.saswat10.instagramclone.repository.UserRepository
 import com.saswat10.instagramclone.utils.SnackBarManager

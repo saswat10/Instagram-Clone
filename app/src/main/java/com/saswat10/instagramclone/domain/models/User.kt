@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.models.domain
+package com.saswat10.instagramclone.domain.models
 
 data class User(
     val userId: String = "",

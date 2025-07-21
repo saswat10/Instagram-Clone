@@ -11,8 +11,8 @@ data class RequestDto(
     val fromUid: String = "",
     val toUid: String = "",
     val status: String = "",
-    val fromUser: DenormalizedUser? = null,
-    val toUser: DenormalizedUser? = null,
+    val fromUser: UserReferenceDto? = null,
+    val toUser: UserReferenceDto? = null,
     @ServerTimestamp val createdAt: Timestamp? = null
 )
 

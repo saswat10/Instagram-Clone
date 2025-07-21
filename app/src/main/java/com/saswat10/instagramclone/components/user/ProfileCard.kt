@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
-import com.saswat10.instagramclone.models.domain.User
+import com.saswat10.instagramclone.domain.models.User
 
 @Composable
 fun ProfileCard(userPreview: User, onClickFollow:()->Unit) {

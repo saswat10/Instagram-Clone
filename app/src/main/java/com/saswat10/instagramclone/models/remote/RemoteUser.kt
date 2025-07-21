@@ -1,7 +1,7 @@
 package com.saswat10.instagramclone.models.remote
 
 import com.google.firebase.firestore.DocumentId
-import com.saswat10.instagramclone.models.domain.User
+import com.saswat10.instagramclone.domain.models.User
 
 data class RemoteUser(
     @DocumentId
