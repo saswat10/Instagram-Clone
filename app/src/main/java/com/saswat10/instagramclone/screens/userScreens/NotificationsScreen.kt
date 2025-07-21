@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.saswat10.instagramclone.components.user.ImageSizes
 import com.saswat10.instagramclone.components.user.ProfilePreviewStrip
-import com.saswat10.instagramclone.domain.models.User
+import com.saswat10.instagramclone.domain.models.UserObs
 import com.saswat10.instagramclone.viewmodels.UserViewModel
 import com.saswat10.instagramclone.viewmodels.UserViewState
 import timber.log.Timber
@@ -83,7 +83,7 @@ fun NotificationsScreen(
 
 
 @Composable
-fun RequestTab(user: User) {
+fun RequestTab(user: UserObs) {
     val sentRequests = user.sentRequests
     val pendingAccepts = user.pendingRequests
     Timber.d("Sent Requests: ${sentRequests.size}")

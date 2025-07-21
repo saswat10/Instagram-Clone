@@ -2,7 +2,7 @@ package com.saswat10.instagramclone.repository
 
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.saswat10.instagramclone.domain.models.User
+import com.saswat10.instagramclone.domain.models.UserObs
 import com.saswat10.instagramclone.models.remote.RemoteUser
 import com.saswat10.instagramclone.models.remote.toUser
 import com.saswat10.instagramclone.utils.FirebaseConstants
@@ -46,7 +46,7 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     /**
      * Get All Users
      */
-    suspend fun getAllUsers(): Result<List<User?>> {
+    suspend fun getAllUsers(): Result<List<UserObs?>> {
         return try {
             val result = userCollection.get().await()
             val users = result.documents.map {
@@ -58,7 +58,7 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
         }
     }
 
-    fun getAllUsersFlow(): Flow<Result<List<User?>>> = callbackFlow{
+    fun getAllUsersFlow(): Flow<Result<List<UserObs?>>> = callbackFlow{
         val registration = userCollection
             .addSnapshotListener { snapshot, e ->
                 if(e != null){
@@ -86,7 +86,7 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     /*
     * Get User by uid
     * */
-    suspend fun getUserByUid(uid: String): Result<User?> {
+    suspend fun getUserByUid(uid: String): Result<UserObs?> {
         return try {
             val result = userCollection.document(uid).get().await()
             if (result.exists()) {
@@ -106,12 +106,12 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     /*
     * Get Followers
     * */
-    suspend fun getFollowers(uid: String): Result<List<User.UserPreview>> {
+    suspend fun getFollowers(uid: String): Result<List<UserObs.UserPreview>> {
         return try {
             val documents =
                 userCollection.document(uid).collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWERS)
                     .get().await()
-            val followers = documents.toObjects(User.UserPreview::class.java)
+            val followers = documents.toObjects(UserObs.UserPreview::class.java)
             Result.success(followers)
         } catch (e: Exception) {
             Result.failure(e)
@@ -121,12 +121,12 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     /*
     * Get FollowingList
     * */
-    suspend fun getFollowing(uid: String): Result<List<User.UserPreview>> {
+    suspend fun getFollowing(uid: String): Result<List<UserObs.UserPreview>> {
         return try {
             val documents =
                 userCollection.document(uid).collection(FirebaseConstants.SUBCOLLECTIONS_FOLLOWING)
                     .get().await()
-            val following = documents.toObjects(User.UserPreview::class.java)
+            val following = documents.toObjects(UserObs.UserPreview::class.java)
             Result.success(following)
         } catch (e: Exception) {
             Result.failure(e)
@@ -136,13 +136,13 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     /*
     * Get PendingAccepts
     * */
-    suspend fun getPendingRequests(uid: String): Result<List<User.UserPreview>> {
+    suspend fun getPendingRequests(uid: String): Result<List<UserObs.UserPreview>> {
         return try {
             val documents =
                 userCollection.document(uid)
                     .collection(FirebaseConstants.SUBCOLLECTIONS_PENDING_ACCEPTS).get()
                     .await()
-            val pendingAccepts = documents.toObjects(User.UserPreview::class.java)
+            val pendingAccepts = documents.toObjects(UserObs.UserPreview::class.java)
             Result.success(pendingAccepts)
         } catch (e: Exception) {
             Result.failure(e)
@@ -152,13 +152,13 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
     /**
     * Get SentRequests
     * */
-    suspend fun getSentRequests(uid: String): Result<List<User.UserPreview>> {
+    suspend fun getSentRequests(uid: String): Result<List<UserObs.UserPreview>> {
         return try {
             val documents =
                 userCollection.document(uid)
                     .collection(FirebaseConstants.SUBCOLLECTIONS_SENT_REQUESTS).get()
                     .await()
-            val sentRequests = documents.toObjects(User.UserPreview::class.java)
+            val sentRequests = documents.toObjects(UserObs.UserPreview::class.java)
             Result.success(sentRequests)
         } catch (e: Exception) {
             Result.failure(e)
@@ -183,13 +183,13 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
                     ?: throw Exception("User not found")
 
                 if (targetUser.private) {
-                    val sentRequestData = User.UserPreview(
+                    val sentRequestData = UserObs.UserPreview(
                         targetUid,
                         targetUser.username,
                         targetUser.fullName,
                         targetUser.profilePic
                     )
-                    val pendingRequestData = User.UserPreview(
+                    val pendingRequestData = UserObs.UserPreview(
                         uid,
                         currentUser.username,
                         currentUser.fullName,
@@ -208,13 +208,13 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
                     )
                 } else {
                     // Public Account
-                    val followerData = User.UserPreview(
+                    val followerData = UserObs.UserPreview(
                         uid,
                         currentUser.username,
                         currentUser.fullName,
                         currentUser.profilePic
                     )
-                    val followingData = User.UserPreview(
+                    val followingData = UserObs.UserPreview(
                         targetUid,
                         targetUser.username,
                         targetUser.fullName,
@@ -305,13 +305,13 @@ class UserRepository @Inject constructor(private val firestore: FirebaseFirestor
                 val currentUser = currentUserDoc.toObject(RemoteUser::class.java)
                     ?: throw Exception("User not found")
 
-                val followerData = User.UserPreview(
+                val followerData = UserObs.UserPreview(
                     targetUid,
                     targetUser.username,
                     targetUser.fullName,
                     targetUser.profilePic
                 )
-                val followingData = User.UserPreview(
+                val followingData = UserObs.UserPreview(
                     uid,
                     currentUser.username,
                     currentUser.fullName,

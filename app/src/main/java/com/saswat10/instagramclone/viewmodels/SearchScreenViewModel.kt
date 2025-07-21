@@ -2,7 +2,7 @@ package com.saswat10.instagramclone.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.saswat10.instagramclone.domain.models.User
+import com.saswat10.instagramclone.domain.models.UserObs
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
 import com.saswat10.instagramclone.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -64,7 +64,7 @@ class SearchScreenViewModel @Inject constructor(
 }
 
 data class SearchScreenViewState(
-    val users: List<User?> = emptyList(),
+    val users: List<UserObs?> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
 )

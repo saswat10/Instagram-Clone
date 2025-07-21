@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.saswat10.instagramclone.domain.models.User.UserPreview
+import com.saswat10.instagramclone.domain.models.UserObs.UserPreview
 import timber.log.Timber
 
 @Composable

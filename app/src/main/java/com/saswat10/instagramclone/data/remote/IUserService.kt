@@ -14,6 +14,8 @@ interface IUserService {
 
     suspend fun getUserByUid(uid: String): Result<UserDto?>
 
+    fun observeUser(uid: String): Flow<Result<UserDto?>>
+
     fun getUsersPaginated(
         limit: Long = 10,
         lastDocumentSnapshot: DocumentSnapshot? = null

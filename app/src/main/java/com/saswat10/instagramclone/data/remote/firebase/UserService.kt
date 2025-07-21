@@ -7,7 +7,9 @@ import com.google.firebase.firestore.snapshots
 import com.saswat10.instagramclone.data.remote.IUserService
 import com.saswat10.instagramclone.data.model.UserDto
 import com.saswat10.instagramclone.utils.FirebaseConstantsV2
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -97,6 +99,31 @@ class UserService @Inject constructor(
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override fun observeUser(uid: String): Flow<Result<UserDto?>> {
+        return callbackFlow {
+            val userDocRef = userCollection.document(uid)
+
+            val subscription = userDocRef.addSnapshotListener {snapshot, error->
+                if(error != null){
+                    trySend(Result.failure(error))
+                }
+                if(snapshot == null) {
+                    return@addSnapshotListener
+                }
+
+                try {
+                    val userDto = snapshot.toObject(UserDto::class.java)
+                    trySend(Result.success(userDto))
+                }catch (e: Throwable){
+                    trySend(Result.failure(e))
+                }
+            }
+            awaitClose {
+                subscription.remove()
+            }
         }
     }
 }

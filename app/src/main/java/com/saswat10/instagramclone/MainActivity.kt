@@ -34,16 +34,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Install the splash screen
         val splashScreen = installSplashScreen()
-
-        // Keep the splash screen on-screen until your content is ready.
-        // For demonstration, we'll simulate some loading time.
-        // In a real app, you'd replace this with your actual initialization logic.
         var keepOnScreen = true
         splashScreen.setKeepOnScreenCondition { keepOnScreen }
 
-        // Simulate some loading
         runBlocking {
             delay(2000) // Simulate a 2-second loading time
             keepOnScreen = false

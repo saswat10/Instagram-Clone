@@ -20,10 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
-import com.saswat10.instagramclone.domain.models.User
+import com.saswat10.instagramclone.domain.models.UserObs
 
 @Composable
-fun UserDetailCard(user: User) {
+fun UserDetailCard(user: UserObs) {
     Column(
         modifier = Modifier
             .fillMaxWidth()

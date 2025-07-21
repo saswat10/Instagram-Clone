@@ -1,7 +1,7 @@
 package com.saswat10.instagramclone.models.remote
 
 import com.google.firebase.firestore.DocumentId
-import com.saswat10.instagramclone.domain.models.User
+import com.saswat10.instagramclone.domain.models.UserObs
 
 data class RemoteUser(
     @DocumentId
@@ -17,8 +17,8 @@ data class RemoteUser(
     val profilePic: String = ""
 )
 
-fun RemoteUser.toUser(): User {
-    return User(
+fun RemoteUser.toUser(): UserObs {
+    return UserObs(
         userId = this.uid,
         username = this.username,
         email = this.email,

@@ -2,7 +2,7 @@ package com.saswat10.instagramclone.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.saswat10.instagramclone.domain.models.User
+import com.saswat10.instagramclone.domain.models.UserObs
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
 import com.saswat10.instagramclone.repository.UserRepository
 import com.saswat10.instagramclone.utils.SnackBarManager
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 sealed interface UserViewState {
     object Loading : UserViewState
-    data class Success(val user: User) : UserViewState
+    data class Success(val user: UserObs) : UserViewState
     data class Error(val exception: Throwable) : UserViewState
 }
 
@@ -35,7 +35,7 @@ class UserViewModel @Inject constructor(
     val usersFlow = userRepository.getAllUsersFlow().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
-        initialValue = emptyList<List<User?>>()
+        initialValue = emptyList<List<UserObs?>>()
     )
 
     init {

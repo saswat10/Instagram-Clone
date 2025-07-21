@@ -10,6 +10,10 @@ import com.saswat10.instagramclone.data.remote.firebase.AuthService
 import com.saswat10.instagramclone.data.remote.firebase.FriendRequestService
 import com.saswat10.instagramclone.data.remote.firebase.PostService
 import com.saswat10.instagramclone.data.remote.firebase.UserService
+import com.saswat10.instagramclone.data.repository.AuthRepository
+import com.saswat10.instagramclone.data.repository.UserRepository
+import com.saswat10.instagramclone.domain.repository.IAuthRepository
+import com.saswat10.instagramclone.domain.repository.IUserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,6 +46,18 @@ object AppModule {
     @Singleton
     fun providePostService(firestore: FirebaseFirestore): IPostService {
         return PostService(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(authService: IAuthService): IAuthRepository {
+        return AuthRepository(authService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(userService: IUserService): IUserRepository {
+        return UserRepository(userService)
     }
 
 }
