@@ -17,4 +17,19 @@ data class RemoteUserV2(
     val posts: Int = 0,
     val profilePic: String = "",
     @ServerTimestamp val createdAt: Timestamp? = null
-)
+){
+
+    @Exclude
+    fun toMap(): Map<String, Any?>{
+        return mapOf(
+            "username" to username,
+            "id" to id,
+            "name" to name,
+            "bio" to bio,
+            "posts" to posts,
+            "friends" to friends,
+            "profilePic" to profilePic,
+            "createdAt" to createdAt
+        )
+    }
+}

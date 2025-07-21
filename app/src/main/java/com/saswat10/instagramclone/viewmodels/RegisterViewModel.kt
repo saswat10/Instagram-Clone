@@ -41,17 +41,18 @@ class RegisterViewModel @Inject constructor(
                     fullName = viewState.value.fullName,
                     email = viewState.value.email
                 )
-                userRepository.createUser(uid = firebaseUser.uid, user = user).onSuccess {message ->
-                    _viewState.update {
-                        it.copy(
-                            uiState = UiState.Success(
-                                "User created successfully",
-                                firebaseUser
+                userRepository.createUser(uid = firebaseUser.uid, user = user)
+                    .onSuccess { message ->
+                        _viewState.update {
+                            it.copy(
+                                uiState = UiState.Success(
+                                    "User created successfully",
+                                    firebaseUser
+                                )
                             )
-                        )
-                    }
-                    SnackBarManager.showMessage("User Creation Success")
-                }.onFailure {error ->
+                        }
+                        SnackBarManager.showMessage("User Creation Success")
+                    }.onFailure { error ->
                     _viewState.update { it.copy(uiState = UiState.Error("Error creating user")) }
                     SnackBarManager.showMessage(error.localizedMessage ?: "Unknown Error")
                 }
