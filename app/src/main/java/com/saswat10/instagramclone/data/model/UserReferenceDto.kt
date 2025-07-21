@@ -1,6 +1,6 @@
-package com.saswat10.instagramclone.models.remote
+package com.saswat10.instagramclone.data.model
 
-data class DenormalizedUser(
+data class UserReferenceDto(
     val uid: String = "",
     val username: String = "",
     val name: String = "",

@@ -5,7 +5,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
-import com.saswat10.instagramclone.models.remote.RemoteUserV2
+import com.saswat10.instagramclone.data.model.UserDto
 import com.saswat10.instagramclone.utils.FirebaseConstantsV2
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,7 +22,7 @@ class UserV2Repository @Inject constructor(
     private val userCollection = firestore.collection(FirebaseConstantsV2.Users.COLLECTION_USERS)
     private val currentUser = auth.currentUser
 
-    suspend fun createUser(user: RemoteUserV2): Result<String> {
+    suspend fun createUser(user: UserDto): Result<String> {
         if (currentUser == null) {
             throw IllegalStateException("Current user is null")
         } else {
@@ -48,14 +48,14 @@ class UserV2Repository @Inject constructor(
         }
     }
 
-    suspend fun getAllUsers(): Result<List<RemoteUserV2?>> {
+    suspend fun getAllUsers(): Result<List<UserDto?>> {
         if (currentUser == null) {
             throw IllegalStateException("Current user is null")
         } else {
             return try {
                 val result = userCollection.get().await()
                 val users = result.documents.map {
-                    it.toObject(RemoteUserV2::class.java)
+                    it.toObject(UserDto::class.java)
                 }
                 Result.success(users)
             } catch (e: Exception) {
@@ -65,11 +65,11 @@ class UserV2Repository @Inject constructor(
 
     }
 
-    suspend fun getUserByUid(uid: String): Result<RemoteUserV2?> {
+    suspend fun getUserByUid(uid: String): Result<UserDto?> {
         return try {
             val result = userCollection.document(uid).get().await()
             if (result.exists()) {
-                val remoteUser = result.toObject(RemoteUserV2::class.java)
+                val remoteUser = result.toObject(UserDto::class.java)
                 Result.success(remoteUser)
             } else {
                 Result.success(null)
@@ -82,7 +82,7 @@ class UserV2Repository @Inject constructor(
     fun getUsersPaginated(
         limit: Long = 10,
         lastDocumentSnapshot: DocumentSnapshot? = null
-    ): Flow<Result<Pair<List<RemoteUserV2?>, DocumentSnapshot?>>> {
+    ): Flow<Result<Pair<List<UserDto?>, DocumentSnapshot?>>> {
         return flow {
             var query = userCollection
                 .orderBy(FirebaseConstantsV2.Common.CREATED_AT, Query.Direction.DESCENDING)
@@ -94,7 +94,7 @@ class UserV2Repository @Inject constructor(
 
             query.snapshots().map { snapshots ->
                 val users = snapshots.documents.mapNotNull { docSnap ->
-                    docSnap.toObject(RemoteUserV2::class.java)
+                    docSnap.toObject(UserDto::class.java)
                 }
                 val newLastDoc = snapshots.documents.lastOrNull()
                 Result.success(Pair(users, newLastDoc))

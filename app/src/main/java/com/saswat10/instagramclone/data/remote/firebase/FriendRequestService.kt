@@ -6,8 +6,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
 import com.saswat10.instagramclone.data.remote.IFriendRequestService
-import com.saswat10.instagramclone.models.remote.RemoteFriends
-import com.saswat10.instagramclone.models.remote.RemoteRequests
+import com.saswat10.instagramclone.data.model.FriendsDto
+import com.saswat10.instagramclone.data.model.RequestDto
 import com.saswat10.instagramclone.utils.Constants
 import com.saswat10.instagramclone.utils.FirebaseConstantsV2
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +27,7 @@ class FriendRequestService @Inject constructor(
     private val userCollection = firestore.collection(FirebaseConstantsV2.Users.COLLECTION_USERS)
 
 
-    override suspend fun sendRequest(request: RemoteRequests): Result<Unit> {
+    override suspend fun sendRequest(request: RequestDto): Result<Unit> {
         return try {
             requestsCollection.add(request).await()
             Result.success(Unit)
@@ -43,11 +43,11 @@ class FriendRequestService @Inject constructor(
                 return Result.failure(Exception("Request not found"))
             }
 
-            val request = requestSnap.toObject(RemoteRequests::class.java) ?: return Result.failure(
+            val request = requestSnap.toObject(RequestDto::class.java) ?: return Result.failure(
                 Exception("Malformed request")
             )
 
-            val friends = RemoteFriends(
+            val friends = FriendsDto(
                 user1 = request.fromUser,
                 user2 = request.toUser,
                 userIds = listOf(request.fromUid, request.toUid)
@@ -116,7 +116,7 @@ class FriendRequestService @Inject constructor(
                 Result.failure(Exception("Friendship Id not found"))
             } else {
                 val friend =
-                    friendSnap.toObject(RemoteFriends::class.java) ?: return Result.failure(
+                    friendSnap.toObject(FriendsDto::class.java) ?: return Result.failure(
                         Exception("Malformed request")
                     )
                 firestore.runTransaction { transaction ->
@@ -145,7 +145,7 @@ class FriendRequestService @Inject constructor(
         currentUserId: String,
         limit: Long,
         lastDocumentSnapshot: DocumentSnapshot?
-    ): Flow<Result<Pair<List<RemoteFriends>, DocumentSnapshot?>>> {
+    ): Flow<Result<Pair<List<FriendsDto>, DocumentSnapshot?>>> {
         return flow {
             var query = friendsCollection.whereArrayContains(
                 FirebaseConstantsV2.Friends.FIELD_USER_IDS, currentUserId
@@ -158,7 +158,7 @@ class FriendRequestService @Inject constructor(
 
             query.snapshots().map { snapshots ->
                 val friendsList = snapshots.documents.mapNotNull { docSnap ->
-                    docSnap.toObject(RemoteFriends::class.java)
+                    docSnap.toObject(FriendsDto::class.java)
                 }
                 val newLastDoc = snapshots.documents.lastOrNull()
                 Result.success(Pair(friendsList, newLastDoc))
@@ -179,7 +179,7 @@ class FriendRequestService @Inject constructor(
         type: String,
         limit: Long,
         lastDocumentSnapshot: DocumentSnapshot?
-    ): Flow<Result<Pair<List<RemoteRequests?>, DocumentSnapshot?>>> {
+    ): Flow<Result<Pair<List<RequestDto?>, DocumentSnapshot?>>> {
         return flow {
             var query = requestsCollection.whereEqualTo(type, currentUserId).whereEqualTo(
                 FirebaseConstantsV2.Requests.FIELD_STATUS, Constants.Status.PENDING
@@ -193,7 +193,7 @@ class FriendRequestService @Inject constructor(
 
             query.snapshots().map { snapshots ->
                 val requests = snapshots.documents.mapNotNull { docSnap ->
-                    docSnap.toObject(RemoteRequests::class.java)
+                    docSnap.toObject(RequestDto::class.java)
                 }
                 val newLastDoc = snapshots.documents.lastOrNull()
                 Result.success(Pair(requests, newLastDoc))

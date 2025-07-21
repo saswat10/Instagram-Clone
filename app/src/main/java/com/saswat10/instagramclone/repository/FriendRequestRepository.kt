@@ -6,8 +6,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
-import com.saswat10.instagramclone.models.remote.RemoteFriends
-import com.saswat10.instagramclone.models.remote.RemoteRequests
+import com.saswat10.instagramclone.data.model.FriendsDto
+import com.saswat10.instagramclone.data.model.RequestDto
 import com.saswat10.instagramclone.utils.Constants
 import com.saswat10.instagramclone.utils.FirebaseConstantsV2
 import com.saswat10.instagramclone.utils.RelationshipStatus
@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -45,7 +44,7 @@ class FriendRequestRepository @Inject constructor(
      */
 
 
-    suspend fun sendRequest(request: RemoteRequests): Result<String> {
+    suspend fun sendRequest(request: RequestDto): Result<String> {
         return try {
             requestsCollection.add(request).await()
             Result.success("Request sent successfully")
@@ -61,11 +60,11 @@ class FriendRequestRepository @Inject constructor(
                 return Result.failure(Exception("Request not found"))
             }
 
-            val request = requestSnap.toObject(RemoteRequests::class.java) ?: return Result.failure(
+            val request = requestSnap.toObject(RequestDto::class.java) ?: return Result.failure(
                 Exception("Malformed request")
             )
 
-            val friends = RemoteFriends(
+            val friends = FriendsDto(
                 user1 = request.fromUser,
                 user2 = request.toUser,
                 userIds = listOf(request.fromUid, request.toUid)
@@ -134,7 +133,7 @@ class FriendRequestRepository @Inject constructor(
                 Result.failure(Exception("Friendship Id not found"))
             } else {
                 val friend =
-                    friendSnap.toObject(RemoteFriends::class.java) ?: return Result.failure(
+                    friendSnap.toObject(FriendsDto::class.java) ?: return Result.failure(
                         Exception("Malformed request")
                     )
                 firestore.runTransaction { transaction ->
@@ -161,7 +160,7 @@ class FriendRequestRepository @Inject constructor(
 
     fun getFriendsFlowPaginated(
         limit: Long = 10, lastDocumentSnapshot: DocumentSnapshot? = null
-    ): Flow<Result<Pair<List<RemoteFriends>, DocumentSnapshot?>>> {
+    ): Flow<Result<Pair<List<FriendsDto>, DocumentSnapshot?>>> {
         if (currentUser != null) {
             return flow {
                 var query = friendsCollection.whereArrayContains(
@@ -175,7 +174,7 @@ class FriendRequestRepository @Inject constructor(
 
                 query.snapshots().map { snapshots ->
                     val friendsList = snapshots.documents.mapNotNull { docSnap ->
-                        docSnap.toObject(RemoteFriends::class.java)
+                        docSnap.toObject(FriendsDto::class.java)
                     }
                     val newLastDoc = snapshots.documents.lastOrNull()
                     Result.success(Pair(friendsList, newLastDoc))
@@ -196,7 +195,7 @@ class FriendRequestRepository @Inject constructor(
      */
     fun getRequestsFlowPaginated(
         type: String, limit: Long = 10, lastDocumentSnapshot: DocumentSnapshot? = null
-    ): Flow<Result<Pair<List<RemoteRequests?>, DocumentSnapshot?>>> {
+    ): Flow<Result<Pair<List<RequestDto?>, DocumentSnapshot?>>> {
 
         if (currentUser != null) {
             return flow {
@@ -212,7 +211,7 @@ class FriendRequestRepository @Inject constructor(
 
                 query.snapshots().map { snapshots ->
                     val requests = snapshots.documents.mapNotNull { docSnap ->
-                        docSnap.toObject(RemoteRequests::class.java)
+                        docSnap.toObject(RequestDto::class.java)
                     }
                     val newLastDoc = snapshots.documents.lastOrNull()
                     Result.success(Pair(requests, newLastDoc))

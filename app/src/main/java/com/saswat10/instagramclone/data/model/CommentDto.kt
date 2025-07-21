@@ -1,11 +1,11 @@
-package com.saswat10.instagramclone.models.remote
+package com.saswat10.instagramclone.data.model
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.ServerTimestamp
 
-data class RemoteComment(
+data class CommentDto(
     @DocumentId val id: String = "",
     val userId: String = "",
     val username: String = "",

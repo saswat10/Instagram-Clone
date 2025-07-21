@@ -6,8 +6,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
 import com.saswat10.instagramclone.data.remote.IPostService
-import com.saswat10.instagramclone.models.remote.RemoteComment
-import com.saswat10.instagramclone.models.remote.RemotePost
+import com.saswat10.instagramclone.data.model.CommentDto
+import com.saswat10.instagramclone.data.model.PostDto
 import com.saswat10.instagramclone.utils.FirebaseConstantsV2
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -21,7 +21,7 @@ class PostService @Inject constructor(
 ) : IPostService {
     private val postCollection = firestore.collection(FirebaseConstantsV2.Posts.COLLECTION_POSTS)
 
-    override suspend fun createPost(post: RemotePost): Result<Unit> {
+    override suspend fun createPost(post: PostDto): Result<Unit> {
         return try {
             postCollection.add(post).await()
             Result.success(Unit)
@@ -32,12 +32,12 @@ class PostService @Inject constructor(
 
     override suspend fun updatePost(
         postId: String,
-        post: RemotePost
+        post: PostDto
     ): Result<Unit> {
         return try {
             val postRef = postCollection.document(postId).get().await()
             if (postRef.exists()) {
-                postRef.toObject(RemotePost::class.java)?.let {
+                postRef.toObject(PostDto::class.java)?.let {
 
                 }
                 postCollection.document(postId).update(post.toMap()).await()
@@ -54,7 +54,7 @@ class PostService @Inject constructor(
         return try {
             val postRef = postCollection.document(postId).get().await()
             if (postRef.exists()) {
-                val post = postRef.toObject(RemotePost::class.java)
+                val post = postRef.toObject(PostDto::class.java)
                 postCollection.document(postId).delete().await()
                 Result.success(Unit)
             } else {
@@ -65,14 +65,14 @@ class PostService @Inject constructor(
         }
     }
 
-    override suspend fun getPosts(userId: String): Result<List<RemotePost?>> {
+    override suspend fun getPosts(userId: String): Result<List<PostDto?>> {
         TODO("Not yet implemented")
     }
 
     override fun getPostsPaginated(
         limit: Long,
         lastDocumentSnapshot: DocumentSnapshot?
-    ): Flow<Result<Pair<List<RemotePost?>, DocumentSnapshot?>>> {
+    ): Flow<Result<Pair<List<PostDto?>, DocumentSnapshot?>>> {
         return flow {
             var query = postCollection.orderBy(
                 FirebaseConstantsV2.Common.CREATED_AT, Query.Direction.DESCENDING
@@ -84,7 +84,7 @@ class PostService @Inject constructor(
 
             query.snapshots().map { queryDocumentSnapshots ->
                 val posts = queryDocumentSnapshots.documents.mapNotNull { documentSnapshot ->
-                    documentSnapshot.toObject(RemotePost::class.java)
+                    documentSnapshot.toObject(PostDto::class.java)
                 }
                 val newLastDoc = queryDocumentSnapshots.documents.lastOrNull()
                 Result.success(Pair(posts, newLastDoc))
@@ -96,11 +96,11 @@ class PostService @Inject constructor(
         }
     }
 
-    override suspend fun getPostById(postId: String): Result<RemotePost?> {
+    override suspend fun getPostById(postId: String): Result<PostDto?> {
         return try {
             val postRef = postCollection.document(postId).get().await()
             if (postRef.exists()) {
-                val post = postRef.toObject(RemotePost::class.java)
+                val post = postRef.toObject(PostDto::class.java)
                 Result.success(post)
             } else {
                 Result.failure(Exception("Post with $postId not found"))
@@ -162,7 +162,7 @@ class PostService @Inject constructor(
 
     override suspend fun createComment(
         postId: String,
-        comment: RemoteComment
+        comment: CommentDto
     ): Result<Unit> {
         return try {
             firestore.runTransaction { transaction ->
@@ -194,7 +194,7 @@ class PostService @Inject constructor(
     override suspend fun updateComment(
         postId: String,
         commentId: String,
-        comment: RemoteComment
+        comment: CommentDto
     ): Result<Unit> {
         return try {
             val result = postCollection.document(postId)
@@ -225,7 +225,7 @@ class PostService @Inject constructor(
         postId: String,
         limit: Long,
         lastDocumentSnapshot: DocumentSnapshot?
-    ): Flow<Result<Pair<List<RemoteComment?>, DocumentSnapshot?>>> {
+    ): Flow<Result<Pair<List<CommentDto?>, DocumentSnapshot?>>> {
         return flow {
             var query = postCollection.document(postId)
                 .collection(FirebaseConstantsV2.Posts.SUBCOLLECTION_COMMENTS)
@@ -238,7 +238,7 @@ class PostService @Inject constructor(
 
             query.snapshots().map { queryDocumentSnapshots ->
                 val posts = queryDocumentSnapshots.documents.mapNotNull { documentSnapshot ->
-                    documentSnapshot.toObject(RemoteComment::class.java)
+                    documentSnapshot.toObject(CommentDto::class.java)
                 }
                 val newLastDoc = queryDocumentSnapshots.documents.lastOrNull()
                 Result.success(Pair(posts, newLastDoc))

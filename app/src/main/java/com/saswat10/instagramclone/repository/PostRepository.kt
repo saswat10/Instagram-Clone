@@ -6,8 +6,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
-import com.saswat10.instagramclone.models.remote.RemoteComment
-import com.saswat10.instagramclone.models.remote.RemotePost
+import com.saswat10.instagramclone.data.model.CommentDto
+import com.saswat10.instagramclone.data.model.PostDto
 import com.saswat10.instagramclone.utils.FirebaseConstantsV2
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -24,7 +24,7 @@ class PostRepository @Inject constructor(
     private val postCollection = fireStore.collection(FirebaseConstantsV2.Posts.COLLECTION_POSTS)
     private val currentUser = auth.currentUser
 
-    suspend fun createPost(post: RemotePost): Result<String> {
+    suspend fun createPost(post: PostDto): Result<String> {
         if (currentUser == null) {
             throw IllegalStateException("Current user is null")
         }
@@ -36,14 +36,14 @@ class PostRepository @Inject constructor(
         }
     }
 
-    suspend fun updatePost(postId: String, post: RemotePost): Result<String> {
+    suspend fun updatePost(postId: String, post: PostDto): Result<String> {
         if (currentUser == null) {
             throw IllegalStateException("Current user is null")
         }
         return try {
             val postRef = postCollection.document(postId).get().await()
             if (postRef.exists()) {
-                postRef.toObject(RemotePost::class.java)?.let {
+                postRef.toObject(PostDto::class.java)?.let {
 
                 }
                 postCollection.document(postId).update(post.toMap()).await()
@@ -63,7 +63,7 @@ class PostRepository @Inject constructor(
         return try {
             val postRef = postCollection.document(postId).get().await()
             if (postRef.exists()) {
-                val post = postRef.toObject(RemotePost::class.java)
+                val post = postRef.toObject(PostDto::class.java)
                 if (post?.userId != currentUser.uid) {
                     Result.failure(Exception("You are not authorized to delete this post"))
                 } else {
@@ -80,7 +80,7 @@ class PostRepository @Inject constructor(
 
     fun getPostsPaginated(
         limit: Long = 10, lastDocumentSnapshot: DocumentSnapshot? = null
-    ): Flow<Result<Pair<List<RemotePost?>, DocumentSnapshot?>>> {
+    ): Flow<Result<Pair<List<PostDto?>, DocumentSnapshot?>>> {
         return flow {
             val currentUserId = currentUser?.uid
 
@@ -99,7 +99,7 @@ class PostRepository @Inject constructor(
 
             query.snapshots().map { queryDocumentSnapshots ->
                 val posts = queryDocumentSnapshots.documents.mapNotNull { documentSnapshot ->
-                    documentSnapshot.toObject(RemotePost::class.java)
+                    documentSnapshot.toObject(PostDto::class.java)
                 }
                 val newLastDoc = queryDocumentSnapshots.documents.lastOrNull()
                 Result.success(Pair(posts, newLastDoc))
@@ -111,11 +111,11 @@ class PostRepository @Inject constructor(
         }
     }
 
-    suspend fun getSinglePost(postId: String): Result<RemotePost?> {
+    suspend fun getSinglePost(postId: String): Result<PostDto?> {
         return try {
             val postRef = postCollection.document(postId).get().await()
             if (postRef.exists()) {
-                val post = postRef.toObject(RemotePost::class.java)
+                val post = postRef.toObject(PostDto::class.java)
                 Result.success(post)
             } else {
                 Result.failure(Exception("Post with $postId not found"))
@@ -180,7 +180,7 @@ class PostRepository @Inject constructor(
         }
     }
 
-    suspend fun createComment(postId: String, comment: RemoteComment): Result<String> {
+    suspend fun createComment(postId: String, comment: CommentDto): Result<String> {
         if (currentUser == null) {
             Result.failure<Exception>(Exception("Current user is null"))
         }
@@ -215,7 +215,7 @@ class PostRepository @Inject constructor(
     suspend fun updateComment(
         postId: String,
         commentId: String,
-        comment: RemoteComment
+        comment: CommentDto
     ): Result<String> {
         if (currentUser == null) {
             Result.failure<Exception>(Exception("Current user is null"))
@@ -249,7 +249,7 @@ class PostRepository @Inject constructor(
         postId: String,
         limit: Long = 10,
         lastDocumentSnapshot: DocumentSnapshot? = null
-    ): Flow<Result<Pair<List<RemoteComment?>, DocumentSnapshot?>>> {
+    ): Flow<Result<Pair<List<CommentDto?>, DocumentSnapshot?>>> {
         return flow {
             val currentUserId = currentUser?.uid
 
@@ -269,7 +269,7 @@ class PostRepository @Inject constructor(
 
             query.snapshots().map { queryDocumentSnapshots ->
                 val posts = queryDocumentSnapshots.documents.mapNotNull { documentSnapshot ->
-                    documentSnapshot.toObject(RemoteComment::class.java)
+                    documentSnapshot.toObject(CommentDto::class.java)
                 }
                 val newLastDoc = queryDocumentSnapshots.documents.lastOrNull()
                 Result.success(Pair(posts, newLastDoc))

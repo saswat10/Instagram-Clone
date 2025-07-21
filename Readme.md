@@ -7,9 +7,9 @@
 
 ## Initial Screenshots
 
-|Update Profile Screen|User Feed Screen|User Profile Screen|
-|------------|-------------|------------|
-|![alt text](images/updateScreen.jpeg)| ![alt text](images/userFeedScreen.jpeg) |![alt text](images/userProfileScreen.jpeg)|
+|         Update Profile Screen         |            User Feed Screen             |            User Profile Screen             |
+|:-------------------------------------:|:---------------------------------------:|:------------------------------------------:|
+| ![alt text](images/updateScreen.jpeg) | ![alt text](images/userFeedScreen.jpeg) | ![alt text](images/userProfileScreen.jpeg) |
 
 ## Todo
 
