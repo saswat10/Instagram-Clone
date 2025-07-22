@@ -3,9 +3,10 @@ package com.saswat10.instagramclone.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saswat10.instagramclone.domain.repository.IAuthRepository
-import com.saswat10.instagramclone.navigation.LoginScreen
-import com.saswat10.instagramclone.navigation.MainScreen
+import com.saswat10.instagramclone.navigation.AuthNavRoutes
+import com.saswat10.instagramclone.navigation.MainNavRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -29,11 +30,12 @@ class MainViewModel @Inject constructor(
         _uiState.update { it.copy(loading = true) }
         viewModelScope.launch {
             val currentUser = authRepo.observeAuthState().first()
+            delay(2000L)
             if (currentUser == null) {
                 _uiState.update {
                     it.copy(
                         loading = false,
-                        startDestination = LoginScreen,
+                        startDestination = AuthNavRoutes.LoginScreen,
                         showBottomTab = false
                     )
                 }
@@ -41,7 +43,7 @@ class MainViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         loading = false,
-                        startDestination = MainScreen,
+                        startDestination = MainNavRoutes.UserFeedScreen,
                         showBottomTab = true
                     )
                 }
@@ -51,7 +53,7 @@ class MainViewModel @Inject constructor(
 }
 
 data class MainActivityUiState(
-    val loading: Boolean = false,
-    val startDestination: Any = LoginScreen,
+    val loading: Boolean = true,
+    val startDestination: Any = AuthNavRoutes.LoginScreen,
     val showBottomTab: Boolean = false
 )

@@ -35,7 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.saswat10.instagramclone.R
 import com.saswat10.instagramclone.components.common.SimpleHeader
 import com.saswat10.instagramclone.components.user.UserDetailCard
+import com.saswat10.instagramclone.navigation.MainNavRoutes
 import com.saswat10.instagramclone.viewmodels.UserViewModel
 import com.saswat10.instagramclone.viewmodels.UserViewState
 import timber.log.Timber
@@ -51,22 +51,12 @@ import timber.log.Timber
 @Composable
 fun ProfileScreen(
     userViewModel: UserViewModel = hiltViewModel(),
-    navigateToUpdate: (() -> Unit),
+    navigateTo: ((id: Any) -> Unit),
 ) {
     val state by userViewModel.viewState.collectAsState()
     val refreshState = state is UserViewState.Loading
 
     val gridState = rememberLazyGridState()
-    val context = LocalContext.current
-    val displayMetrics = context.resources.displayMetrics
-
-    // Width and height of screen
-    val width = displayMetrics.widthPixels
-    val height = displayMetrics.heightPixels
-
-    // Device density
-    val density = displayMetrics.density
-
     when (state) {
         is UserViewState.Loading -> {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -107,9 +97,7 @@ fun ProfileScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Button(
-                                    onClick = {
-                                        navigateToUpdate()
-                                    },
+                                    onClick = {navigateTo(MainNavRoutes.UpdateScreen)},
                                     modifier = Modifier.weight(1f)
                                 ) { Text("Edit Profile") }
                                 FilledTonalButton(

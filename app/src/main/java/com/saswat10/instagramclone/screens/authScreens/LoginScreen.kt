@@ -35,13 +35,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.saswat10.instagramclone.navigation.AuthNavRoutes
 import com.saswat10.instagramclone.viewmodels.LoginViewModel
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel<LoginViewModel>(),
-    navigateToRegister: () -> Unit,
-    navigateToPassword: () -> Unit
+    navigateTo: ((id: Any) -> Unit),
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -89,7 +89,7 @@ fun LoginScreen(
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 TextButton(onClick = {
-                    navigateToPassword()
+                    navigateTo(AuthNavRoutes.PasswordScreen)
                 }) {
                     Text("Forgot Password?")
                 }
@@ -128,7 +128,7 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable {
-                        navigateToRegister()
+                        navigateTo(AuthNavRoutes.RegisterScreen)
                     }
                 )
             }

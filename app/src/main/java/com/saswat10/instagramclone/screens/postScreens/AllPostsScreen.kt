@@ -37,7 +37,7 @@ import com.saswat10.instagramclone.components.posts.mediaList3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AllPostsScreen(updateProfile: () -> Unit) {
+fun AllPostsScreen(navigateTo: ((id: Any) -> Unit)) {
     Column(
         modifier = Modifier
             .fillMaxSize()

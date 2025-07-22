@@ -268,7 +268,7 @@ fun InstagramCloneTheme(
       }
       
       darkTheme -> darkScheme
-      else -> lightScheme
+      else -> darkScheme
   }
 
   MaterialTheme(

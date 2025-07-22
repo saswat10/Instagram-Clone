@@ -37,8 +37,7 @@ import com.saswat10.instagramclone.viewmodels.RegisterViewModel
 @Composable
 fun RegisterScreen(
     registerViewModel: RegisterViewModel = hiltViewModel<RegisterViewModel>(),
-    onBack: (() -> Unit),
-    navigateToUpdate: (() -> Unit)
+    navigateTo: ((id: Any) -> Unit),
 ) {
     var showPassword by rememberSaveable { mutableStateOf(false) }
     var showConfirmPassword by rememberSaveable { mutableStateOf(false) }

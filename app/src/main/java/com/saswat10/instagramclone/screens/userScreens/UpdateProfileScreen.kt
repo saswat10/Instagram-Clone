@@ -38,12 +38,8 @@ import kotlinx.coroutines.flow.collectLatest // For SharedFlow collection
 @OptIn(ExperimentalMaterial3Api::class) // Or remove if not using experimental features
 @Composable
 fun UpdateProfileScreen(
-    navigateToDiscover: Boolean, // This is an argument, not a state that changes within the Composable
-    updateViewModel: UpdateViewModel = hiltViewModel(), // Use type inference
-    onBack: (() -> Unit), // Make this non-nullable, provide empty lambda if no back
-    // Renamed for clarity on where it leads if navigateToDiscover is true
-    navigateToMainScreen: (() -> Unit)
-    // Removed navigateToMainScreen as its usage was unclear and potentially redundant
+    navigateTo: ((id: Any)->Unit),
+    updateViewModel: UpdateViewModel = hiltViewModel(),
 ) {
     val updateViewState by updateViewModel.updateViewState.collectAsState()
 
@@ -54,59 +50,12 @@ fun UpdateProfileScreen(
     val getContent =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { result: Uri? ->
             updateViewModel.onProfilePictureSelected(result)
-            // IMPORTANT: Do NOT call updateViewModel.uploadImage() here.
-            // The upload happens when the "Update" button is clicked via updateViewModel.updateProfile().
         }
-
-    // --- Handle one-time events from ViewModel (e.g., Snackbars, Navigation) ---
-    LaunchedEffect(Unit) {
-        updateViewModel.eventFlow.collectLatest { event ->
-            when (event) {
-                is UpdateProfileEvent.ShowSnackbar -> {
-                    // TODO: Show Snackbar using a Scaffold's SnackbarHostState
-                    // For example:
-                    // val snackbarHostState = remember { SnackbarHostState() }
-                    // scope.launch { snackbarHostState.showSnackbar(event.message) }
-                    println("Snackbar message: ${event.message}") // For debugging
-                }
-                UpdateProfileEvent.UpdateSuccess -> {
-                    // Trigger navigation when the ViewModel signals success
-                    // This relies on the navigateToDiscover boolean passed from the NavGraph
-                    if (navigateToDiscover) {
-                        navigateToMainScreen()
-                    } else {
-                        // For existing users, if they simply updated their profile
-                        // and navigateToDiscover is false, you might just want to pop back.
-                        onBack()
-                    }
-                }
-            }
-        }
-    }
-
-    // BackHandler should only block if we are in a forced update state
-    // and navigation to discover is expected after success.
-    // If navigateToDiscover is true, we prevent going back to registration.
-    // The auto-navigation on success will handle forward movement.
-    BackHandler(enabled = navigateToDiscover && !updateViewState.successMessage.isNullOrEmpty()) {
-        // If navigateToDiscover is true and success message is not empty,
-        // this block is executed. We might want to do nothing here
-        // as the LaunchedEffect should handle forward navigation.
-        // Or if you explicitly want to prevent back until navigation is done:
-        // Log.d("UpdateProfileScreen", "Back press ignored for first-time user after update.")
-    }
-
 
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
-        // Header logic
-        if (navigateToDiscover) {
-            SimpleHeader("Update Profile") // No back button for first-time users
-        } else {
-            SimpleHeader("Update Profile", onBack = { onBack() }) // Back button for existing users
-        }
-
+        SimpleHeader("Update Profile") // No back button for first-time users
         Column(
             Modifier
                 .fillMaxSize()
