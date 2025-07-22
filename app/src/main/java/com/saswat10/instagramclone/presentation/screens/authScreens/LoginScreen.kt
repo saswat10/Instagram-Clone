@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens.authScreens
+package com.saswat10.instagramclone.presentation.screens.authScreens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

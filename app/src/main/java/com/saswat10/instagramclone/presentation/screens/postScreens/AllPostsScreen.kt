@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens.postScreens
+package com.saswat10.instagramclone.presentation.screens.postScreens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,11 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.saswat10.instagramclone.components.posts.MediaCarousel2
-import com.saswat10.instagramclone.components.posts.PostCard
-import com.saswat10.instagramclone.components.posts.mediaList
-import com.saswat10.instagramclone.components.posts.mediaList2
-import com.saswat10.instagramclone.components.posts.mediaList3
+import com.saswat10.instagramclone.presentation.components.posts.PostCard
+import com.saswat10.instagramclone.presentation.components.posts.mediaList
+import com.saswat10.instagramclone.presentation.components.posts.mediaList2
+import com.saswat10.instagramclone.presentation.components.posts.mediaList3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

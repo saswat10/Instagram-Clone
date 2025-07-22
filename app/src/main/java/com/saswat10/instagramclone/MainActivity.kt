@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.firebase.auth.FirebaseAuth
-import com.saswat10.instagramclone.screens.AppNavigationScreen
+import com.saswat10.instagramclone.presentation.screens.AppNavigationScreen
 import com.saswat10.instagramclone.ui.theme.InstagramCloneTheme
 import com.saswat10.instagramclone.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint

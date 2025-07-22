@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.components.user
+package com.saswat10.instagramclone.presentation.components.user
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

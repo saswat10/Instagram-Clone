@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.components.posts
+package com.saswat10.instagramclone.presentation.components.posts
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens.postScreens
+package com.saswat10.instagramclone.presentation.screens.postScreens
 
 import android.content.Context
 import android.net.Uri
@@ -15,11 +15,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.saswat10.instagramclone.components.posts.Media
-import com.saswat10.instagramclone.components.posts.MediaCarousel2
-import com.saswat10.instagramclone.components.posts.MediaType
-import com.saswat10.instagramclone.components.posts.MediaUri
-import com.saswat10.instagramclone.components.posts.mediaList
+import com.saswat10.instagramclone.presentation.components.posts.Media
+import com.saswat10.instagramclone.presentation.components.posts.MediaCarousel2
+import com.saswat10.instagramclone.presentation.components.posts.MediaType
+import com.saswat10.instagramclone.presentation.components.posts.MediaUri
+import com.saswat10.instagramclone.presentation.components.posts.mediaList
 
 @Composable
 fun WritePostScreen() {

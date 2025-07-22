@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens.searchScreens
+package com.saswat10.instagramclone.presentation.screens.searchScreens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -38,7 +38,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.saswat10.instagramclone.components.user.ProfileCard
+import com.saswat10.instagramclone.presentation.components.user.ProfileCard
 import com.saswat10.instagramclone.viewmodels.SearchScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

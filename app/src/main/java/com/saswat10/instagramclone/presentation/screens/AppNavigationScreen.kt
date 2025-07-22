@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens
+package com.saswat10.instagramclone.presentation.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

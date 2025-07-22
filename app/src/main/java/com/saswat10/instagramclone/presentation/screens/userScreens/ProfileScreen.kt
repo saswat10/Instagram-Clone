@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens.userScreens
+package com.saswat10.instagramclone.presentation.screens.userScreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -40,8 +40,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.saswat10.instagramclone.R
-import com.saswat10.instagramclone.components.common.SimpleHeader
-import com.saswat10.instagramclone.components.user.UserDetailCard
+import com.saswat10.instagramclone.presentation.components.common.SimpleHeader
+import com.saswat10.instagramclone.presentation.components.user.UserDetailCard
 import com.saswat10.instagramclone.navigation.MainNavRoutes
 import com.saswat10.instagramclone.viewmodels.UserViewModel
 import com.saswat10.instagramclone.viewmodels.UserViewState

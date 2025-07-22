@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens.chatScreens
+package com.saswat10.instagramclone.presentation.screens.chatScreens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

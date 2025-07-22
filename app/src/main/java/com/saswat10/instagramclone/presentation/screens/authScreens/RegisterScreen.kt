@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens.authScreens
+package com.saswat10.instagramclone.presentation.screens.authScreens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement

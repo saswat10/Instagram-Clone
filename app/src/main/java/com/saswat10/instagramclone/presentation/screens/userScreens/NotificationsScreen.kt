@@ -1,4 +1,4 @@
-package com.saswat10.instagramclone.screens.userScreens
+package com.saswat10.instagramclone.presentation.screens.userScreens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,8 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.saswat10.instagramclone.components.user.ImageSizes
-import com.saswat10.instagramclone.components.user.ProfilePreviewStrip
+import com.saswat10.instagramclone.presentation.components.user.ImageSizes
+import com.saswat10.instagramclone.presentation.components.user.ProfilePreviewStrip
 import com.saswat10.instagramclone.domain.models.UserObs
 import com.saswat10.instagramclone.viewmodels.UserViewModel
 import com.saswat10.instagramclone.viewmodels.UserViewState

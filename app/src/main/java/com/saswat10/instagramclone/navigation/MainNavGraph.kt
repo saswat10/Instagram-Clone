@@ -3,13 +3,13 @@ package com.saswat10.instagramclone.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.saswat10.instagramclone.screens.chatScreens.ChatScreen
-import com.saswat10.instagramclone.screens.postScreens.AllPostsScreen
-import com.saswat10.instagramclone.screens.postScreens.WritePostScreen
-import com.saswat10.instagramclone.screens.searchScreens.SearchScreen
-import com.saswat10.instagramclone.screens.userScreens.NotificationsScreen
-import com.saswat10.instagramclone.screens.userScreens.ProfileScreen
-import com.saswat10.instagramclone.screens.userScreens.UpdateProfileScreen
+import com.saswat10.instagramclone.presentation.screens.chatScreens.ChatScreen
+import com.saswat10.instagramclone.presentation.screens.postScreens.AllPostsScreen
+import com.saswat10.instagramclone.presentation.screens.postScreens.WritePostScreen
+import com.saswat10.instagramclone.presentation.screens.searchScreens.SearchScreen
+import com.saswat10.instagramclone.presentation.screens.userScreens.NotificationsScreen
+import com.saswat10.instagramclone.presentation.screens.userScreens.ProfileScreen
+import com.saswat10.instagramclone.presentation.screens.userScreens.UpdateProfileScreen
 
 
 fun NavGraphBuilder.mainNavGraph(navController: NavController){
