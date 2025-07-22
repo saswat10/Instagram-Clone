@@ -12,7 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
@@ -33,7 +38,7 @@ import coil3.compose.SubcomposeAsyncImage
 import com.saswat10.instagramclone.R
 
 data class Media(
-    val id: String,
+    val id: Int,
     val url: Any, // change this when using for cloud images/video
     val type: MediaType
     // add content description
@@ -55,36 +60,36 @@ enum class MediaType(
 
 
 val mediaList = listOf(
-    Media("1", R.drawable.img1, MediaType.IMAGE),
+    Media(1, R.drawable.img1, MediaType.IMAGE),
     Media(
-        "2",
+        2,
         "https://packaged-media.redd.it/ja9e4qlmjsdf1/pb/m2-res_720p.mp4?m=DASHPlaylist.mpd&v=1&e=1752930000&s=645564a713aff9c8af99fcf4009314123b3c8b57",
         MediaType.VIDEO
     ),
-    Media("3", "https://i.redd.it/tsgrtjdmbwcf1.png", MediaType.IMAGE),
-    Media("4", R.drawable.astronaut_nord, MediaType.IMAGE),
-    Media("5", "https://i.redd.it/km3fsv43vndf1.png", MediaType.IMAGE)
+    Media(3, "https://i.redd.it/tsgrtjdmbwcf1.png", MediaType.IMAGE),
+    Media(4, R.drawable.astronaut_nord, MediaType.IMAGE),
+    Media(5, "https://i.redd.it/km3fsv43vndf1.png", MediaType.IMAGE)
 )
 
 val mediaList2 = listOf(
-    Media("1", "https://i.redd.it/inp5g0gawmdf1.png", MediaType.IMAGE),
+    Media(1, "https://i.redd.it/inp5g0gawmdf1.png", MediaType.IMAGE),
     Media(
-        "2",
+        2,
         "https://packaged-media.redd.it/vp4qybt64qdf1/pb/m2-res_450p.mp4?m=DASHPlaylist.mpd&v=1&e=1752930000&s=0a2c217f3662e47a4d93d3e734c4194fea7abe2a",
         MediaType.VIDEO
     ),
-    Media("3", "https://i.redd.it/tsgrtjdmbwcf1.png", MediaType.IMAGE),
+    Media(3, "https://i.redd.it/tsgrtjdmbwcf1.png", MediaType.IMAGE),
 )
 
 val mediaList3 = listOf(
-    Media("1", "https://i.redd.it/05lk0ri3fpdf1.jpeg", MediaType.IMAGE),
-    Media("3", R.drawable.img1, MediaType.IMAGE),
+    Media(1, "https://i.redd.it/05lk0ri3fpdf1.jpeg", MediaType.IMAGE),
+    Media(3, R.drawable.img1, MediaType.IMAGE),
     Media(
-        "2",
+        2,
         "https://packaged-media.redd.it/lazq39khlqdf1/pb/m2-res_640p.mp4?m=DASHPlaylist.mpd&v=1&e=1752933600&s=728ffaa6bf21695b57357763eb6d7f6a6709889d",
         MediaType.VIDEO
     ),
-    Media("4", R.drawable.astronaut_nord, MediaType.IMAGE),
+    Media(4, R.drawable.astronaut_nord, MediaType.IMAGE),
 )
 
 @Composable
@@ -143,7 +148,11 @@ fun MediaCarousel(mediaList: List<MediaUri> = emptyList()) {
 
 
 @Composable
-fun MediaCarousel2(mediaList: List<Media> = emptyList()) {
+fun MediaCarousel2(
+    mediaList: List<Media> = emptyList(),
+    removeItem: ((index: Int) -> Unit)? = null,
+    showRemove: Boolean = false
+) {
     val pagerState = rememberPagerState(
         pageCount = {
             mediaList.size
@@ -154,17 +163,18 @@ fun MediaCarousel2(mediaList: List<Media> = emptyList()) {
     HorizontalPager(state = pagerState, Modifier.fillMaxWidth()) { page ->
         val media = mediaList[page]
         val type = mediaList[page].type
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(7/8f)
+        ) {
             when (type) {
                 MediaType.IMAGE -> {
                     AsyncImage(
                         model = media.url,
                         contentDescription = null,
                         modifier = Modifier
-//                            .aspectRatio(1f)
-                            .fillMaxWidth()
+                            .matchParentSize()
                             .pointerInput(Unit) {
                                 detectTapGestures(
                                     onTap = { isVisible = !isVisible },
@@ -188,6 +198,13 @@ fun MediaCarousel2(mediaList: List<Media> = emptyList()) {
                 }
             }
 
+            if (showRemove) {
+                FilledIconButton(
+                    onClick = { removeItem?.invoke(page) },
+                    modifier = Modifier.padding(6.dp),
+                    shape = CircleShape
+                ) { Icon(Icons.Default.Close, null) }
+            }
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(),
