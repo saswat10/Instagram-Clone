@@ -13,10 +13,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
-object ImageSizes {
-    val LARGE = 60.dp
+object ImageSizes
+{
+    val EXTRASMALL = 20.dp
+    val SMALL = 30.dp
     val MEDIUM = 40.dp
-    val SMALL = 80.dp
+    val LARGE = 60.dp
+    val EXTRALARGE = 70.dp
+
 }
 
 

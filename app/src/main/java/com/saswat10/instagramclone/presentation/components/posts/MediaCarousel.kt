@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -92,59 +93,6 @@ val mediaList3 = listOf(
     Media(4, R.drawable.astronaut_nord, MediaType.IMAGE),
 )
 
-@Composable
-fun MediaCarousel(mediaList: List<MediaUri> = emptyList()) {
-    val pagerState = rememberPagerState(
-        pageCount = {
-            mediaList.size
-        },
-    )
-
-    var isVisible by remember { mutableStateOf(false) }
-    HorizontalPager(state = pagerState, Modifier.fillMaxWidth()) { page ->
-        val media = mediaList[page]
-        Box(
-            modifier = Modifier
-                .aspectRatio(1f, matchHeightConstraintsFirst = false)
-                .fillMaxWidth()
-        ) {
-            SubcomposeAsyncImage(
-                model = media.url,
-                loading = { CircularProgressIndicator() },
-                contentDescription = null,
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .matchParentSize()
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onTap = { isVisible = !isVisible },
-                            onPress = {},
-                            onDoubleTap = {},
-                            onLongPress = {}
-                        )
-                    },
-                contentScale = ContentScale.Inside
-            )
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier.align(Alignment.BottomEnd)
-            ) {
-                Text(
-                    text = "${page + 1}/${pagerState.pageCount}",
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .clip(ShapeDefaults.Small)
-                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
-                        .padding(6.dp)
-
-
-                )
-            }
-        }
-    }
-}
 
 
 @Composable
@@ -160,7 +108,11 @@ fun MediaCarousel2(
     )
 
     var isVisible by remember { mutableStateOf(false) }
-    HorizontalPager(state = pagerState, Modifier.fillMaxWidth()) { page ->
+    HorizontalPager(state = pagerState, Modifier.fillMaxWidth()
+        .padding(horizontal = 10.dp)
+        .clip(MaterialTheme.shapes.medium)
+        .border(0.5.dp, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.medium)
+    ) { page ->
         val media = mediaList[page]
         val type = mediaList[page].type
         Box(
