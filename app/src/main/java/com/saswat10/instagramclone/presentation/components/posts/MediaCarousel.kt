@@ -154,14 +154,15 @@ fun MediaCarousel2(
                 FilledIconButton(
                     onClick = { removeItem?.invoke(page) },
                     modifier = Modifier.padding(6.dp),
-                    shape = CircleShape
+                    shape = CircleShape,
                 ) { Icon(Icons.Default.Close, null) }
             }
+
             AnimatedVisibility(
                 visible = isVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
-                modifier = Modifier.align(Alignment.BottomEnd)
+                modifier = Modifier.align(Alignment.TopEnd)
             ) {
                 Text(
                     text = "${page + 1}/${pagerState.pageCount}",

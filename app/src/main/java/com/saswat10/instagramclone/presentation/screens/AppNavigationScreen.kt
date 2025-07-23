@@ -1,5 +1,10 @@
 package com.saswat10.instagramclone.presentation.screens
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
@@ -71,7 +76,33 @@ fun AppNavigationScreen(
         Column(modifier = Modifier.padding(padValues)) {
             if (!uiState.loading) {
                 NavHost(
-                    navController = navController, startDestination = uiState.startDestination
+                    navController = navController, startDestination = uiState.startDestination,
+                    enterTransition = {
+                        slideInHorizontally(
+                            initialOffsetX = { fullWidth -> fullWidth }, // Starts from right
+                            animationSpec = tween(durationMillis = 300)
+                        ) + fadeIn(animationSpec = tween(durationMillis = 300))
+                    },
+                    exitTransition = {
+                        slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> -fullWidth }, // Slides to left
+                            animationSpec = tween(durationMillis = 300)
+                        ) + fadeOut(animationSpec = tween(durationMillis = 300))
+                    },
+                    popEnterTransition = {
+                        // Define the pop enter animation for this screen (when navigating back to Home)
+                        slideInHorizontally(
+                            initialOffsetX = { fullWidth -> -fullWidth }, // Slides in from left
+                            animationSpec = tween(durationMillis = 300)
+                        ) + fadeIn(animationSpec = tween(durationMillis = 300))
+                    },
+                    popExitTransition = {
+                        // Define the pop exit animation for this screen (when Home is popped off stack)
+                        slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> fullWidth }, // Slides out to right
+                            animationSpec = tween(durationMillis = 300)
+                        ) + fadeOut(animationSpec = tween(durationMillis = 300))
+                    }
                 ) {
                     authNavGraph(navController)
                     mainNavGraph(navController)

@@ -43,7 +43,6 @@ fun SimpleHeader(
                 style = MaterialTheme.typography.titleLarge
             )
         }
-        HorizontalDivider()
 
     }
 }
