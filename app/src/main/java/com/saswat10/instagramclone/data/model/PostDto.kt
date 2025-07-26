@@ -13,12 +13,13 @@ data class PostDto(
     val userId: String = "",
     val profilePic: String = "",
     val caption: String = "",
-    val media: List<Media> = emptyList(),
+    val media: List<MediaDto> = emptyList(),
     val likesCount: Int = 0,
     val commentsCount: Int = 0,
     @ServerTimestamp val createdAt: Timestamp? = null,
 ){
-    data class Media(
+    data class MediaDto(
+        val id: String = "",
         val url: String = "",
         val type: String = ""
     )

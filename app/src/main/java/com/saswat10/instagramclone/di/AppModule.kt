@@ -14,6 +14,7 @@ import com.saswat10.instagramclone.data.repository.AuthRepository
 import com.saswat10.instagramclone.data.repository.UserRepository
 import com.saswat10.instagramclone.domain.repository.IAuthRepository
 import com.saswat10.instagramclone.domain.repository.IUserRepository
+import dagger.Component
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,5 +60,6 @@ object AppModule {
     fun provideUserRepository(userService: IUserService): IUserRepository {
         return UserRepository(userService)
     }
+
 
 }

@@ -37,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -61,7 +62,16 @@ fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
             it.mapIndexed { index, uri ->
                 val mimeType = viewModel.getUriMimeType(context, uri)
                 val media = viewModel.mimeToMedia(mimeType, index, uri)
-                viewModel.addMedia(media)
+                viewModel.addMedia(media, uri)
+            }
+        }
+
+    val pickVideo =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
+            if(it!=null) {
+                val mimeType = viewModel.getUriMimeType(context, it)
+                val media = viewModel.mimeToMedia(mimeType, 0, it)
+                viewModel.addMedia(media, it)
             }
         }
 
@@ -75,7 +85,7 @@ fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
                 .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             SimpleHeader(title = "Create New Post")
-            OutlinedTextField(
+            TextField(
                 value = uiState.caption,
                 onValueChange = viewModel::addCaption,
                 modifier = Modifier
@@ -84,6 +94,7 @@ fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
                 minLines = 3,
                 placeholder = { Text("Add Caption") },
             )
+            if(uiState.media.isEmpty()) EmptyCarousel()
             MediaCarousel2(uiState.media, viewModel::removeMedia, true)
 
 
@@ -105,10 +116,10 @@ fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
             TextButton(onClick = { pickContent.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
                 Icon(Icons.TwoTone.AddToPhotos, "", Modifier.size(ImageSizes.SMALL))
             }
-            TextButton(onClick = { pickContent.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.VideoOnly)) }) {
+            TextButton(onClick = { pickVideo.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.VideoOnly)) }) {
                 Icon(Icons.TwoTone.SmartDisplay, "", Modifier.size(ImageSizes.SMALL))
             }
-            Button(onClick = {}, enabled = !uiState.media.isEmpty()) { Text("Share") }
+            Button(onClick = viewModel::share, enabled = !uiState.media.isEmpty()) { Text("Share") }
         }
 
     }
@@ -116,12 +127,11 @@ fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun EmptyCarousel(onClick: (() -> Unit)) {
+fun EmptyCarousel() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(7 / 8f)
-            .clickable { onClick() },
+            .aspectRatio(7 / 8f),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
