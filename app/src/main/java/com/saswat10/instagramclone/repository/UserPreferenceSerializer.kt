@@ -4,13 +4,15 @@ import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
 import com.saswat10.instagramclone.datastore.UserPreferences
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.OutputStream
 
 
 object UserPreferenceSerializer : Serializer<UserPreferences> {
     override val defaultValue = UserPreferences.getDefaultInstance()
-    override suspend fun readFrom(input: InputStream): UserPreferences {
+    override suspend fun readFrom(input: InputStream): UserPreferences  {
         try {
             return UserPreferences.parseFrom(input)
         } catch (e: InvalidProtocolBufferException) {

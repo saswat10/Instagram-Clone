@@ -5,13 +5,18 @@ import android.net.Uri
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.saswat10.instagramclone.data.UserDatastoreRepository
 import com.saswat10.instagramclone.data.remote.IPostService
+import com.saswat10.instagramclone.datastore.UserPreferences
 import com.saswat10.instagramclone.domain.use_cases.CreatePostUseCase
 import com.saswat10.instagramclone.presentation.components.posts.Media
 import com.saswat10.instagramclone.presentation.components.posts.MediaType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -20,12 +25,19 @@ import javax.inject.Inject
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
     private val createPostUseCase: CreatePostUseCase,
-    private val postService: IPostService
-
+    private val postService: IPostService,
+    private val userPreferencesRepository: UserDatastoreRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreatePostUiState())
     val uiState = _uiState.asStateFlow()
+
+    val userPreferences: StateFlow<UserPreferences?> = userPreferencesRepository.userPreferencesFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
 
     fun addCaption(newCaption: String) {
@@ -74,6 +86,7 @@ class CreatePostViewModel @Inject constructor(
 
         viewModelScope.launch {
             createPostUseCase.uploadFiles(_uiState.value.uris)
+            userPreferencesRepository.updateId("11121")
         }
 
     }

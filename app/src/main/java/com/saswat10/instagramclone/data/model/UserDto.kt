@@ -10,6 +10,7 @@ import com.google.firebase.firestore.ServerTimestamp
 data class UserDto(
     @DocumentId val id: String = "",
     val username: String = "",
+    val email: String = "",
     val name: String = "",
     val bio: String = "",
     val friends: Int = 0,

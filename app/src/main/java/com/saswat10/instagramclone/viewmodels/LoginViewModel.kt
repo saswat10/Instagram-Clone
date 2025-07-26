@@ -3,15 +3,22 @@ package com.saswat10.instagramclone.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
+import com.saswat10.instagramclone.data.UserDatastoreRepository
+import com.saswat10.instagramclone.datastore.UserPreferences
+import com.saswat10.instagramclone.domain.models.User
 import com.saswat10.instagramclone.domain.repository.IAuthRepository
 import com.saswat10.instagramclone.domain.use_cases.LoginUseCase
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
 import com.saswat10.instagramclone.utils.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 sealed interface LoginViewState {
@@ -28,7 +35,8 @@ data class LoginUiState(
     val error: String? = null,
     val showPassword: Boolean = false,
     val isLoginSuccess: Boolean = false,
-    val shouldNavigate: Boolean = false
+    val shouldNavigate: Boolean = false,
+    val user: User? = null
 )
 
 
@@ -36,7 +44,9 @@ data class LoginUiState(
 class LoginViewModel @Inject constructor(
     private val authRepository: FirebaseAuthRepository,
     private val authRepo: IAuthRepository,
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val userPreferencesRepository: UserDatastoreRepository
+
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<LoginViewState?>(null)
@@ -45,6 +55,14 @@ class LoginViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
+
+    val userPreferences: StateFlow<UserPreferences?> = userPreferencesRepository.userPreferencesFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
 
 
     fun onEmailChanged(newEmail: String) {
@@ -67,16 +85,24 @@ class LoginViewModel @Inject constructor(
             val email = _uiState.value.email
             val password = _uiState.value.password
 
-            val result = loginUseCase(email, password)
-            result.onSuccess { user ->
-                _uiState.update { loginUiState ->
-                    loginUiState.copy(
-                        isLoginSuccess = user != null,
-                        loading = false,
-                        shouldNavigate = user != null,
-                        error = if (user == null) "Login Success but user profile not found" else null
-                    )
-                }
+            loginUseCase(email, password).onSuccess { user ->
+
+               user?.let {
+                   Timber.d(user.toString())
+                   _uiState.update { loginUiState ->
+                       loginUiState.copy(
+                           isLoginSuccess = true,
+                           loading = false,
+                           shouldNavigate = true,
+                           error = null,
+                           user = user
+                       )
+                   }
+                   userPreferencesRepository.updateName(user.name)
+                   userPreferencesRepository.updateId(user.userId)
+                   userPreferencesRepository.updateUsername(user.username)
+                   userPreferencesRepository.updateProfilePic(user.profilePic)
+               }
             }.onFailure { error ->
                 _uiState.update { loginUiState ->
                     loginUiState.copy(
@@ -88,34 +114,5 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
-
-
-    fun login(email: String, password: String) {
-        viewModelScope.launch {
-            if (email == "" || password == "") {
-                _viewState.update {
-                    LoginViewState.Error(
-                        message = "Email and password cannot be empty"
-                    )
-                }
-                SnackBarManager.showMessage("Email and password cannot be empty.")
-            } else {
-
-                _viewState.update { LoginViewState.Loading }
-                authRepository.signIn(email, password).onSuccess { user ->
-                    _viewState.update {
-                        LoginViewState.Success(user = user)
-                    }
-                }.onFailure { failure ->
-                    _viewState.update { it ->
-                        LoginViewState.Error(message = failure.localizedMessage ?: "Unknown error")
-
-                    }
-                    SnackBarManager.showMessage(failure.localizedMessage ?: "Unknown error")
-                }
-            }
-        }
-    }
-
 }
 

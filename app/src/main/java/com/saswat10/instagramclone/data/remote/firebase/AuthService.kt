@@ -15,7 +15,7 @@ class AuthService @Inject constructor(
     override suspend fun login(
         email: String,
         password: String
-    ): FirebaseUser? {
+    ): FirebaseUser?{
         val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
         return result.user
     }

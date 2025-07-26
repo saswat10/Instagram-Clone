@@ -76,7 +76,8 @@ fun LoginScreen(
                 value = uiState.email,
                 onValueChange = viewModel::onEmailChanged,
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
             OutlinedTextField(
                 value = uiState.password,
@@ -116,6 +117,7 @@ fun LoginScreen(
             }
 
         }
+
         Column(
             Modifier
                 .fillMaxWidth()

@@ -3,7 +3,6 @@ package com.saswat10.instagramclone.presentation.screens.postScreens
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,25 +15,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddToPhotos
-import androidx.compose.material.icons.outlined.DeleteForever
-import androidx.compose.material.icons.outlined.SmartDisplay
-import androidx.compose.material.icons.rounded.AddPhotoAlternate
 import androidx.compose.material.icons.rounded.AddToPhotos
-import androidx.compose.material.icons.rounded.DeleteForever
-import androidx.compose.material.icons.rounded.SmartDisplay
-import androidx.compose.material.icons.rounded.VideoLibrary
-import androidx.compose.material.icons.rounded.VideoStable
-import androidx.compose.material.icons.twotone.AddPhotoAlternate
 import androidx.compose.material.icons.twotone.AddToPhotos
 import androidx.compose.material.icons.twotone.Delete
 import androidx.compose.material.icons.twotone.SmartDisplay
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -56,6 +43,7 @@ import com.saswat10.instagramclone.viewmodels.CreatePostViewModel
 fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val userPrefs by viewModel.userPreferences.collectAsState()
 
     val pickContent =
         rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) {
@@ -97,6 +85,11 @@ fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
             if(uiState.media.isEmpty()) EmptyCarousel()
             MediaCarousel2(uiState.media, viewModel::removeMedia, true)
 
+
+            userPrefs?.name?.let { Text(it) }
+            userPrefs?.username?.let { Text(it) }
+            userPrefs?.profilePic?.let { Text(it) }
+            userPrefs?.uid?.let { Text(it) }
 
         }
 

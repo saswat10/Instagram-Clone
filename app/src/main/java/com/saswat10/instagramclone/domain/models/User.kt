@@ -11,7 +11,8 @@ data class User(
     val username: String ="",
     val name: String = "",
     val bio: String = "",
-    val profilePic: String? = null,
+    val profilePic: String = "",
     val posts: Int = 0,
     val friends: Int = 0,
+    val createdAt: LocalDateTime? = null
 )

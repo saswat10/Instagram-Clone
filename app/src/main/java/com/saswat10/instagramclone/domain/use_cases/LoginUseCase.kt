@@ -1,6 +1,6 @@
 package com.saswat10.instagramclone.domain.use_cases
 
-import com.saswat10.instagramclone.data.mapper.UserMapper.merge
+import com.saswat10.instagramclone.data.UserDatastoreRepository
 import com.saswat10.instagramclone.domain.models.User
 import com.saswat10.instagramclone.domain.repository.IAuthRepository
 import com.saswat10.instagramclone.domain.repository.IUserRepository
@@ -8,7 +8,8 @@ import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
     private val authRepository: IAuthRepository,
-    private val userRepository: IUserRepository
+    private val userRepository: IUserRepository,
+    private val userPref: UserDatastoreRepository
 ) {
 
     suspend operator fun invoke(email: String, password: String): Result<User?> {
@@ -17,19 +18,11 @@ class LoginUseCase @Inject constructor(
         }
 
 
-        val authResult = authRepository.login(email, password)
-        return authResult.onSuccess { authUser ->
-            if (authUser == null) {
-                return Result.failure(Exception("Null user from Firebase Auth"))
-            }
-            val profileFetch = userRepository.getUserById(authUser.userId)
-            profileFetch.onSuccess { dbUser ->
-                Result.success(dbUser?.merge(dbUser, authUser))
-            }.onFailure {
-                Result.failure<Throwable>(Exception("Failed to fetch User profile from Firestore"))
-            }
-        }.onFailure {
-            return@onFailure
-        }
+        val authResult = authRepository.login(email, password).getOrNull()
+        val uid = authResult?.userId
+        if (uid == null) return Result.failure(Exception("Null"))
+        val dbResult = userRepository.getUserById(uid).getOrNull()
+
+        return Result.success(dbResult)
     }
 }
