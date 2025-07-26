@@ -29,7 +29,7 @@ class MainViewModel @Inject constructor(
     private fun checkAuthenticationStatus() {
         _uiState.update { it.copy(loading = true) }
         viewModelScope.launch {
-            val currentUser = authRepo.observeAuthState().first()
+            val currentUser = authRepo.observeAuthState()
             delay(2000L)
             if (currentUser == null) {
                 _uiState.update {

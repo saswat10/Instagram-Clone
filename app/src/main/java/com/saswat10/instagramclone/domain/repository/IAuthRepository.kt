@@ -10,5 +10,5 @@ interface IAuthRepository {
     fun logout()
     fun getCurrentUser(): Result<User?>
     fun isLoggedIn(): Boolean
-    fun observeAuthState(): Flow<User?>
+    fun observeAuthState(): FirebaseUser?
 }

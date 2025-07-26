@@ -25,6 +25,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,9 +43,16 @@ import com.saswat10.instagramclone.viewmodels.LoginViewModel
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel<LoginViewModel>(),
     navigateTo: ((id: Any) -> Unit),
+    navigateOnLogin:(()->Unit)
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.isLoginSuccess) {
+        if(uiState.isLoginSuccess){
+            navigateOnLogin()
+        }
+    }
 
     Box(
         modifier = Modifier

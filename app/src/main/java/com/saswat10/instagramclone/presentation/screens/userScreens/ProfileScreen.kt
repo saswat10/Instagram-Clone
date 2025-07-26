@@ -39,6 +39,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Search
 import com.saswat10.instagramclone.R
 import com.saswat10.instagramclone.presentation.components.common.SimpleHeader
 import com.saswat10.instagramclone.presentation.components.user.UserDetailCard
@@ -52,6 +54,7 @@ import timber.log.Timber
 fun ProfileScreen(
     userViewModel: UserViewModel = hiltViewModel(),
     navigateTo: ((id: Any) -> Unit),
+    onSignOut: ()->Unit
 ) {
     val state by userViewModel.viewState.collectAsState()
     val refreshState = state is UserViewState.Loading
@@ -96,13 +99,15 @@ fun ProfileScreen(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Icon(Lucide.Search, null)
                                 Button(
                                     onClick = {navigateTo(MainNavRoutes.UpdateScreen)},
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
                                 ) { Text("Edit Profile") }
                                 FilledTonalButton(
                                     onClick = {
                                         userViewModel.signOut()
+                                        onSignOut()
                                     },
                                     modifier = Modifier.weight(1f),
                                     colors = ButtonDefaults.elevatedButtonColors(

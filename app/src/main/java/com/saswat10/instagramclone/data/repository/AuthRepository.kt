@@ -1,13 +1,19 @@
 package com.saswat10.instagramclone.data.repository
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.saswat10.instagramclone.data.mapper.UserMapper.toDomainUser
 import com.saswat10.instagramclone.data.remote.IAuthService
 import com.saswat10.instagramclone.domain.models.User
 import com.saswat10.instagramclone.domain.repository.IAuthRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class AuthRepository @Inject constructor(
     private val authService: IAuthService
 ) : IAuthRepository {
@@ -52,9 +58,7 @@ class AuthRepository @Inject constructor(
         return getCurrentUser().getOrNull() != null
     }
 
-    override fun observeAuthState(): Flow<User?> {
-        return authService.observeCurrentUser().map {
-            it?.toDomainUser()
+    override fun observeAuthState(): FirebaseUser? {
+        return FirebaseAuth.getInstance().currentUser
         }
-    }
 }
