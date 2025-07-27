@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
+import com.saswat10.instagramclone.domain.use_cases.RegisterUseCase
 import com.saswat10.instagramclone.models.remote.RemoteUser
 import com.saswat10.instagramclone.repository.CloudinaryRepository
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
@@ -20,49 +21,68 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val authRepository: FirebaseAuthRepository,
     private val userRepository: UserRepository,
+    private val registerUseCase: RegisterUseCase,
     private val cloudinaryRepository: CloudinaryRepository
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(RegisterFormUiState())
     val viewState = _viewState.asStateFlow()
 
-    fun registerAndCreate() {
-        _viewState.update { it.copy(uiState = UiState.Loading) }
-        viewModelScope.launch {
-            // first register
-            authRepository.register(
-                email = viewState.value.email,
-                password = viewState.value.password
-            ).onSuccess { firebaseUser ->
-                // create user
-                val user = RemoteUser(
-                    uid = firebaseUser!!.uid,
-                    username = viewState.value.username,
-                    fullName = viewState.value.fullName,
-                    email = viewState.value.email
-                )
-                userRepository.createUser(uid = firebaseUser.uid, user = user)
-                    .onSuccess { message ->
-                        _viewState.update {
-                            it.copy(
-                                uiState = UiState.Success(
-                                    "User created successfully",
-                                    firebaseUser
-                                )
-                            )
-                        }
-                        SnackBarManager.showMessage("User Creation Success")
-                    }.onFailure { error ->
-                    _viewState.update { it.copy(uiState = UiState.Error("Error creating user")) }
-                    SnackBarManager.showMessage(error.localizedMessage ?: "Unknown Error")
-                }
-            }.onFailure { error ->
-                _viewState.update { it.copy(uiState = UiState.Error("Error registering user")) }
-                SnackBarManager.showMessage(error.localizedMessage ?: "Unknown Error")
-            }
 
+    fun registerUser(){
+        viewModelScope.launch {
+            _viewState.update { it.copy(loading = true ) }
+            registerUseCase.invoke(
+                name = _viewState.value.fullName,
+                username = _viewState.value.username,
+                email = _viewState.value.email,
+                password = _viewState.value.password
+            ).onSuccess {
+                _viewState.update { it.copy(loading = false, registrationSuccess = true) }
+            }.onFailure { error ->
+                _viewState.update { it.copy(loading = false, registrationSuccess = false, error = error.localizedMessage) }
+            }
         }
     }
+
+
+//    fun registerAndCreate() {
+//        _viewState.update { it.copy(uiState = UiState.Loading) }
+//        viewModelScope.launch {
+//            // first register
+//            authRepository.register(
+//                email = viewState.value.email,
+//                password = viewState.value.password
+//            ).onSuccess { firebaseUser ->
+//                // create user
+//                val user = RemoteUser(
+//                    uid = firebaseUser!!.uid,
+//                    username = viewState.value.username,
+//                    fullName = viewState.value.fullName,
+//                    email = viewState.value.email
+//                )
+//                userRepository.createUser(uid = firebaseUser.uid, user = user)
+//                    .onSuccess { message ->
+//                        _viewState.update {
+//                            it.copy(
+//                                uiState = UiState.Success(
+//                                    "User created successfully",
+//                                    firebaseUser
+//                                )
+//                            )
+//                        }
+//                        SnackBarManager.showMessage("User Creation Success")
+//                    }.onFailure { error ->
+//                    _viewState.update { it.copy(uiState = UiState.Error("Error creating user")) }
+//                    SnackBarManager.showMessage(error.localizedMessage ?: "Unknown Error")
+//                }
+//            }.onFailure { error ->
+//                _viewState.update { it.copy(uiState = UiState.Error("Error registering user")) }
+//                SnackBarManager.showMessage(error.localizedMessage ?: "Unknown Error")
+//            }
+//
+//        }
+//    }
 
 
     fun onUsernameChange(username: String) {
@@ -97,6 +117,17 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
+    fun togglePasswordShow(){
+        _viewState.update {
+            it.copy(showPassword = !it.showPassword)
+        }
+    }
+
+    fun toggleConfirmPasswordShow(){
+        _viewState.update {
+            it.copy(showConfirmPassword = !it.showConfirmPassword)
+        }
+    }
 }
 
 data class RegisterFormUiState(
@@ -105,12 +136,16 @@ data class RegisterFormUiState(
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
+    val showPassword: Boolean = false,
+    val showConfirmPassword: Boolean = false,
     val profilePicture: Uri? = null,
-    val uiState: UiState? = null
+    val loading: Boolean = false,
+    val error: String? = null,
+    val registrationSuccess: Boolean? = null
 )
 
-sealed interface UiState {
-    object Loading : UiState
-    data class Success(val message: String, val user: FirebaseUser?) : UiState
-    data class Error(val message: String) : UiState
-}
+//sealed interface UiState {
+//    object Loading : UiState
+//    data class Success(val message: String, val user: FirebaseUser?) : UiState
+//    data class Error(val message: String) : UiState
+//}

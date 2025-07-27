@@ -22,7 +22,16 @@ fun NavGraphBuilder.authNavGraph(navController: NavHostController) {
         })
     }
     composable<AuthNavRoutes.RegisterScreen> {
-        RegisterScreen(navigateTo = { navController.navigate(route = it) })
+        RegisterScreen(navigateTo = { navController.navigate(route = it) }, navigateToUpdate = {
+            navController.navigate(
+                MainNavRoutes.UpdateScreen
+            ) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                    inclusive = true
+                }
+            }
+        })
     }
     composable<AuthNavRoutes.PasswordScreen> { ResetPassword(navigateBack = { navController.popBackStack() }) }
 }

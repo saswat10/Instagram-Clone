@@ -24,6 +24,18 @@ object UserMapper {
     fun FirebaseUser.toDomainUser(): User {
         return User(
             userId = this.uid,
+            email = this.email?:"",
+        )
+    }
+
+    fun User.toUserDto(): UserDto{
+        return UserDto(
+            name = this.name,
+            username = this.username,
+            posts = this.posts,
+            friends = this.friends,
+            bio = this.bio,
+            profilePic = this.profilePic,
             email = this.email,
         )
     }

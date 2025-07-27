@@ -21,11 +21,12 @@ class AuthRepository @Inject constructor(
         email: String,
         password: String
     ): Result<User?> {
-        return try {
+        return runCatching {
             val result = authService.login(email, password)
-            Result.success(result?.toDomainUser())
-        } catch (e: Exception) {
-            Result.failure(e)
+            if (result == null) {
+                throw IllegalStateException("Login operation returned a null result.")
+            }
+            result.toDomainUser()
         }
     }
 

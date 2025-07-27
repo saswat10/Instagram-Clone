@@ -1,6 +1,7 @@
 package com.saswat10.instagramclone.data.repository
 
 import com.saswat10.instagramclone.data.mapper.UserMapper.toDomainUser
+import com.saswat10.instagramclone.data.mapper.UserMapper.toUserDto
 import com.saswat10.instagramclone.data.remote.IUserService
 import com.saswat10.instagramclone.domain.models.User
 import com.saswat10.instagramclone.domain.repository.IUserRepository
@@ -24,6 +25,12 @@ class UserRepository @Inject constructor(
     override suspend fun getUserById(uid: String): Result<User?> {
         return userService.getUserByUid(uid).map {
             it?.toDomainUser()
+        }
+    }
+
+    override suspend fun createUser(uid: String, user: User): Result<Unit> {
+        return runCatching {
+            userService.createNewUser(uid, user.toUserDto())
         }
     }
 }

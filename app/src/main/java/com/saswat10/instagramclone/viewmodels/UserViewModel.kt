@@ -2,6 +2,8 @@ package com.saswat10.instagramclone.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.saswat10.instagramclone.data.UserDatastoreRepository
+import com.saswat10.instagramclone.datastore.UserPreferences
 import com.saswat10.instagramclone.domain.models.UserObs
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
 import com.saswat10.instagramclone.repository.UserRepository
@@ -9,6 +11,7 @@ import com.saswat10.instagramclone.utils.SnackBarManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -25,7 +28,8 @@ sealed interface UserViewState {
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val authRepository: FirebaseAuthRepository
+    private val authRepository: FirebaseAuthRepository,
+    private val userPreferencesRepository: UserDatastoreRepository
 ) : ViewModel() {
     private val _viewState = MutableStateFlow<UserViewState>(UserViewState.Loading)
     private var _uid = ""
@@ -37,6 +41,13 @@ class UserViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(),
         initialValue = emptyList<List<UserObs?>>()
     )
+
+    val userPreferences: StateFlow<UserPreferences?> = userPreferencesRepository.userPreferencesFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     init {
         viewModelScope.launch {
@@ -56,33 +67,33 @@ class UserViewModel @Inject constructor(
         }
     }
 
-     fun getUser(uid: String = _uid) {
+    fun getUser(uid: String = _uid) {
         if (uid.isEmpty()) {
             _viewState.value =
                 UserViewState.Error(IllegalStateException("User ID is not set. Cannot fetch followers."))
             return
         }
-         viewModelScope.launch {
-             _viewState.value = UserViewState.Loading
-             userRepository.getUserByUid(uid).onSuccess {
-                 if (it != null) {
-                     _viewState.value = UserViewState.Success(it)
-                     imageUrl = it.profilePic
-                 } else {
-                     _viewState.value =
-                         UserViewState.Error(NoSuchElementException("User Not Found"))
-                 }
-             }.onFailure {
-                 _viewState.value = UserViewState.Error(it)
-             }
-         }
+        viewModelScope.launch {
+            _viewState.value = UserViewState.Loading
+            userRepository.getUserByUid(uid).onSuccess {
+                if (it != null) {
+                    _viewState.value = UserViewState.Success(it)
+                    imageUrl = it.profilePic
+                } else {
+                    _viewState.value =
+                        UserViewState.Error(NoSuchElementException("User Not Found"))
+                }
+            }.onFailure {
+                _viewState.value = UserViewState.Error(it)
+            }
+        }
     }
 
     fun updateUser(hashMap: HashMap<String, Any>) {
         viewModelScope.launch {
-            _viewState.update{  UserViewState.Loading }
+            _viewState.update { UserViewState.Loading }
             userRepository.updateUser(_uid, hashMap)
-                .onSuccess{
+                .onSuccess {
                     SnackBarManager.showMessage(it)
                 }
                 .onFailure {
@@ -92,10 +103,13 @@ class UserViewModel @Inject constructor(
                 }
         }
     }
-    
+
 
     fun signOut() {
-        authRepository.signOut()
+        viewModelScope.launch {
+            authRepository.signOut()
+            userPreferencesRepository.clearAll()
+        }
     }
 
     fun getFollowers(uid: String = _uid) {

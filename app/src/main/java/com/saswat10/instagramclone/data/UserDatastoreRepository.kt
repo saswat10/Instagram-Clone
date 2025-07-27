@@ -14,15 +14,14 @@ class UserDatastoreRepository @Inject constructor(
     private val dataStore: DataStore<UserPreferences>
 ) {
 
-    val userPreferencesFlow: Flow<UserPreferences> = dataStore.data.
-        catch { e->
-            if(e is IOException){
-                Timber.e("UserPreferencesRepo, Error reading preferences.")
-                emit(UserPreferences.getDefaultInstance())
-            }else{
-                throw e
-            }
+    val userPreferencesFlow: Flow<UserPreferences> = dataStore.data.catch { e ->
+        if (e is IOException) {
+            Timber.e("UserPreferencesRepo, Error reading preferences.")
+            emit(UserPreferences.getDefaultInstance())
+        } else {
+            throw e
         }
+    }
 
     suspend fun updateId(id: String) {
         dataStore.updateData { currentPreferences ->
@@ -52,6 +51,17 @@ class UserDatastoreRepository @Inject constructor(
         dataStore.updateData { currentPreferences ->
             currentPreferences.toBuilder()
                 .setName(name)
+                .build()
+        }
+    }
+
+    suspend fun saveUser(uid: String, name: String, username: String, profilePic: String) {
+        dataStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder()
+                .setUid(uid)
+                .setName(name)
+                .setUsername(username)
+                .setProfilePic(profilePic)
                 .build()
         }
     }
