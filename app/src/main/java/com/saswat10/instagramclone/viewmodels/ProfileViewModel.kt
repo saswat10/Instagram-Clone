@@ -35,6 +35,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
 //            authRepository.
             userPreferencesRepository.clearAll()
+            userRepository.clearUser()
         }
     }
 }

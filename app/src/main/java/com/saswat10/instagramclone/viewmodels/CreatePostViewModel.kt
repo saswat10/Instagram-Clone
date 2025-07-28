@@ -6,7 +6,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.saswat10.instagramclone.data.UserDatastoreRepository
-import com.saswat10.instagramclone.data.remote.IPostService
+import com.saswat10.instagramclone.data.repository.UserRepository
 import com.saswat10.instagramclone.datastore.UserPreferences
 import com.saswat10.instagramclone.domain.use_cases.CreatePostUseCase
 import com.saswat10.instagramclone.presentation.components.posts.Media
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
     private val createPostUseCase: CreatePostUseCase,
-    private val postService: IPostService,
+    private val userRepository: UserRepository,
     private val userPreferencesRepository: UserDatastoreRepository
 ) : ViewModel() {
 
@@ -71,22 +71,48 @@ class CreatePostViewModel @Inject constructor(
     }
 
 
+    fun createPost(uploadedUrls: List<String>) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(loading = true) }
+            userRepository.createPost(
+                uploadedUrls,
+                _uiState.value.media[0].type.type,
+                _uiState.value.caption
+            )
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            loading = false,
+                            uploadSuccess = true,
+                            media = emptyList(),
+                            uris = emptyList(),
+                            caption = ""
+                        )
+                    }
+                }
+                .onFailure {
+                    //TODO
+                    _uiState.update { it.copy(loading = false) }
+                }
+        }
+    }
 
     fun share() {
-        createPostUseCase.setUploadCallbacks(
-            onSuccess = { uploadedUrls->
-                Timber.d(uploadedUrls.toString())
-            },
-            onError = { error ->
-                Timber.d(error.description)
-            },
-            onProgress = { progress ->
-            }
-        )
-
         viewModelScope.launch {
+            _uiState.update { it.copy(loading = true) }
+            createPostUseCase.setUploadCallbacks(
+                onSuccess = { uploadedUrls ->
+                    createPost(uploadedUrls)
+                    _uiState.update { it.copy(loading = false) }
+                },
+                onError = { error ->
+                    Timber.d(error.description)
+                },
+                onProgress = { progress ->
+//                    _uiState.update { it.copy(loading = progress) }
+                }
+            )
             createPostUseCase.uploadFiles(_uiState.value.uris)
-            userPreferencesRepository.updateId("11121")
         }
 
     }
@@ -94,7 +120,7 @@ class CreatePostViewModel @Inject constructor(
 
 
 data class CreatePostUiState(
-    val loading: Boolean = false,
+    val loading: Boolean? = null,
     val error: String? = null,
     val uploadSuccess: Boolean = false,
     val media: List<Media> = emptyList(),

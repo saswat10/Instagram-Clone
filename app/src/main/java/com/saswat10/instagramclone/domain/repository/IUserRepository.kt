@@ -10,4 +10,8 @@ interface IUserRepository {
 
     suspend fun createUser(uid: String, user: User): Result<Unit>
 
+    suspend fun createPost(urls: List<String>, typeString: String, captionString: String): Result<Unit>
+
+    fun clearUser()
+
 }

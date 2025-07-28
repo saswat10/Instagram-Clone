@@ -5,9 +5,9 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
-import com.saswat10.instagramclone.data.remote.IPostService
 import com.saswat10.instagramclone.data.model.CommentDto
 import com.saswat10.instagramclone.data.model.PostDto
+import com.saswat10.instagramclone.data.remote.IPostService
 import com.saswat10.instagramclone.utils.FirebaseConstantsV2
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -20,13 +20,18 @@ class PostService @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : IPostService {
     private val postCollection = firestore.collection(FirebaseConstantsV2.Posts.COLLECTION_POSTS)
+    private val userCollection = firestore.collection(FirebaseConstantsV2.Users.COLLECTION_USERS)
 
     override suspend fun createPost(post: PostDto): Result<Unit> {
-        return try {
-            postCollection.add(post).await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+        return runCatching {
+            firestore.runTransaction {
+                val userRef = userCollection.document(post.userId)
+                val newPostRef = postCollection.document()
+
+                it.set(newPostRef, post)
+                it.update(userRef, FirebaseConstantsV2.Users.FIELD_POSTS, FieldValue.increment(1))
+
+            }.await()
         }
     }
 

@@ -15,7 +15,9 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class CreatePostUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
@@ -32,13 +34,10 @@ class CreatePostUseCase @Inject constructor(
     private var overallErrorCallback: ((ErrorInfo) -> Unit)? = null
     private var overallProgressCallback: ((Int) -> Unit)? = null
 
-    private var list = mutableListOf<PostDto.MediaDto>()
-
     fun setUploadCallbacks(
-        // send the list of urls, user_id, username, profilePic
         onSuccess: (List<String>) -> Unit,
         onError: (ErrorInfo) -> Unit,
-        onProgress: (Int) -> Unit = {} // Optional progress callback
+        onProgress: (Int) -> Unit = {}
     ) {
         this.overallUploadCallback = onSuccess
         this.overallErrorCallback = onError

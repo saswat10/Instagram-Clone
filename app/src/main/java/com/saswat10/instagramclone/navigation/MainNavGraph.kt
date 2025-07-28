@@ -26,6 +26,8 @@ fun NavGraphBuilder.mainNavGraph(navController: NavController){
             }
         }
     }) }
-    composable<MainNavRoutes.CreatePostScreen>{ CreatePostScreen() }
+    composable<MainNavRoutes.CreatePostScreen>{ CreatePostScreen(navigateUp = {
+        navController.navigateUp()
+    }) }
     composable<MainNavRoutes.UpdateScreen> { UpdateProfileScreen(navigateTo = {navController.navigate(it)}) }
 }

@@ -3,6 +3,9 @@ package com.saswat10.instagramclone.presentation.screens.postScreens
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,12 +23,16 @@ import androidx.compose.material.icons.twotone.AddToPhotos
 import androidx.compose.material.icons.twotone.Delete
 import androidx.compose.material.icons.twotone.SmartDisplay
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -40,10 +47,9 @@ import com.saswat10.instagramclone.presentation.components.user.ImageSizes
 import com.saswat10.instagramclone.viewmodels.CreatePostViewModel
 
 @Composable
-fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
+fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel(), navigateUp:()->Unit) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
-    val userPrefs by viewModel.userPreferences.collectAsState()
 
     val pickContent =
         rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) {
@@ -63,6 +69,11 @@ fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
             }
         }
 
+    LaunchedEffect(uiState.uploadSuccess) {
+        if(uiState.uploadSuccess == true){
+            navigateUp()
+        }
+    }
 
 
     Box() {
@@ -72,7 +83,8 @@ fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
             modifier = Modifier
                 .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            SimpleHeader(title = "Create New Post")
+            SimpleHeader(title = "Create New Post", onBack = {navigateUp()})
+            uiState.loading?.let {if(it) LinearProgressIndicator(modifier=Modifier.fillMaxWidth()) }
             TextField(
                 value = uiState.caption,
                 onValueChange = viewModel::addCaption,
@@ -82,14 +94,14 @@ fun CreatePostScreen(viewModel: CreatePostViewModel = hiltViewModel()) {
                 minLines = 3,
                 placeholder = { Text("Add Caption") },
             )
-            if(uiState.media.isEmpty()) EmptyCarousel()
-            MediaCarousel2(uiState.media, viewModel::removeMedia, true)
 
+            AnimatedVisibility(uiState.media.isEmpty()) {
+                if (uiState.media.isEmpty()) EmptyCarousel()
+            }
+            AnimatedVisibility(uiState.media.isNotEmpty()) {
+                MediaCarousel2(uiState.media, viewModel::removeMedia, true)
+            }
 
-            userPrefs?.name?.let { Text(it) }
-            userPrefs?.username?.let { Text(it) }
-            userPrefs?.profilePic?.let { Text(it) }
-            userPrefs?.uid?.let { Text(it) }
 
         }
 
