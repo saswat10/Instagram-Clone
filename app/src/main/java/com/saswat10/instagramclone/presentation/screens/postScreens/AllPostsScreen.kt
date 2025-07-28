@@ -38,7 +38,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.saswat10.instagramclone.R
+import com.saswat10.instagramclone.data.UserDatastoreRepository
+import com.saswat10.instagramclone.data.repository.UserRepository
+import com.saswat10.instagramclone.domain.models.User
+import com.saswat10.instagramclone.domain.repository.IAuthRepository
 import com.saswat10.instagramclone.navigation.MainNavRoutes
 import com.saswat10.instagramclone.presentation.components.common.Avatar
 import com.saswat10.instagramclone.presentation.components.posts.Comment
@@ -47,10 +54,36 @@ import com.saswat10.instagramclone.presentation.components.posts.mediaList
 import com.saswat10.instagramclone.presentation.components.posts.mediaList2
 import com.saswat10.instagramclone.presentation.components.posts.mediaList3
 import com.saswat10.instagramclone.presentation.components.user.ImageSizes
+import com.saswat10.instagramclone.viewmodels.ProfileViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+
+@HiltViewModel
+class FeedViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val authRepository: IAuthRepository,
+    private val userPreferencesRepository: UserDatastoreRepository
+): ViewModel(){
+
+    init {
+        viewModelScope.launch {
+            val currentUserId = authRepository.observeAuthState()?.uid
+            if(currentUserId != null && userRepository.user.value == User()){
+                userRepository.getUserById(currentUserId)
+            }
+        }
+    }
+
+}
+
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AllPostsScreen(navigateTo: ((id: Any) -> Unit)) {
+fun AllPostsScreen(navigateTo: ((id: Any) -> Unit), hiltViewModel: FeedViewModel = hiltViewModel()) {
     Box(
         modifier = Modifier
             .fillMaxSize()

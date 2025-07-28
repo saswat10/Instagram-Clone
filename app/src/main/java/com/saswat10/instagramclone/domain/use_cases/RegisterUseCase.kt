@@ -31,6 +31,8 @@ class RegisterUseCase @Inject constructor(
                         )
                         userRepository.createUser(user.userId, userRef).onSuccess {
                             userPreferencesRepository.saveUser(user.userId, name, username, "")
+                        }.onSuccess {
+                            userRepository.getUserById(user.userId)
                         }
                     } else {
                         Result.failure(IllegalArgumentException(""))

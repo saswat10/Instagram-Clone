@@ -9,4 +9,5 @@ interface IUserRepository {
     suspend fun getUserById(uid: String): Result<User?>
 
     suspend fun createUser(uid: String, user: User): Result<Unit>
+
 }
