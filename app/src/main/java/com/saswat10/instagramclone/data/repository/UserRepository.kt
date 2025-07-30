@@ -1,11 +1,13 @@
 package com.saswat10.instagramclone.data.repository
 
 import com.saswat10.instagramclone.data.UserDatastoreRepository
+import com.saswat10.instagramclone.data.mapper.PostMapper.toPost
 import com.saswat10.instagramclone.data.mapper.UserMapper.toDomainUser
 import com.saswat10.instagramclone.data.mapper.UserMapper.toUserDto
 import com.saswat10.instagramclone.data.model.PostDto
 import com.saswat10.instagramclone.data.remote.IPostService
 import com.saswat10.instagramclone.data.remote.IUserService
+import com.saswat10.instagramclone.domain.models.Post
 import com.saswat10.instagramclone.domain.models.User
 import com.saswat10.instagramclone.domain.repository.IUserRepository
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,7 +27,9 @@ class UserRepository @Inject constructor(
 ) : IUserRepository {
 
     private val _user = MutableStateFlow(User())
+    private val _posts = MutableStateFlow<List<Post?>>(emptyList())
     val user = _user.asStateFlow()
+    val posts = _posts.asStateFlow()
 
     override suspend fun observeUserById(uid: String): Flow<Result<User?>> {
         val userFlow = userService.observeUser(uid)
@@ -50,6 +55,8 @@ class UserRepository @Inject constructor(
                     user.profilePic
                 )
             }
+        }.onFailure {
+            Timber.e(it.localizedMessage)
         }
     }
 
@@ -80,13 +87,26 @@ class UserRepository @Inject constructor(
         }
     }
 
+    override suspend fun getUserPosts(userId: String): Result<List<Post?>> {
+        return postService.getPosts(userId).map { it ->
+            it.map { dto ->
+                dto?.toPost()
+            }
+        }.onSuccess { posts ->
+            _posts.update{posts}
+        }.onFailure {
+            Timber.e(it.localizedMessage)
+        }
+
+    }
+
     override fun clearUser() {
         _user.value = User()
     }
 
 
-    fun toPostMediaDto(list: List<String>, type: String): List<PostDto.MediaDto>{
-        return list.mapIndexed {index, url ->
+    fun toPostMediaDto(list: List<String>, type: String): List<PostDto.MediaDto> {
+        return list.mapIndexed { index, url ->
             PostDto.MediaDto(index.toString(), url, type)
         }
     }

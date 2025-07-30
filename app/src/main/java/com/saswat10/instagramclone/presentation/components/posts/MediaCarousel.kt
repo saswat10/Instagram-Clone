@@ -56,7 +56,13 @@ enum class MediaType(
     val type: String
 ) {
     IMAGE("image"),
-    VIDEO("video")
+    VIDEO("video");
+
+    companion object {
+        fun fromType(type: String): MediaType? {
+            return MediaType.entries.find { it.type.equals(type, ignoreCase = true) }
+        }
+    }
 }
 
 

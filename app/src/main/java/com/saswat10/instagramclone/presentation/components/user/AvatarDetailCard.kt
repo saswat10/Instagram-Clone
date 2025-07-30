@@ -82,7 +82,7 @@ fun AvatarDetailCard(user: User, onEdit: (() -> Unit)? = null, onSignOut: (() ->
             }
         }
         Spacer(Modifier.size(10.dp))
-        Text(user.bio, Modifier.fillMaxWidth())
+        Text(user.bio, Modifier.fillMaxWidth().padding(6.dp))
         Spacer(Modifier.size(10.dp))
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),

@@ -11,6 +11,7 @@ import com.saswat10.instagramclone.domain.repository.IUserRepository
 import com.saswat10.instagramclone.repository.FirebaseAuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,13 +22,21 @@ class ProfileViewModel @Inject constructor(
 ) : ViewModel() {
 
     val user = userRepository.user
+    val posts = userRepository.posts
 
     init {
         viewModelScope.launch {
             val currentUserId = authRepository.observeAuthState()?.uid
             if(currentUserId != null && userRepository.user.value == User()){
                 userRepository.getUserById(currentUserId)
+                userRepository.getUserPosts(currentUserId).onSuccess {
+                    Timber.d("Bew Strigde")
+                    Timber.d(posts.toString())
+                }.onFailure {
+                    Timber.e(it.localizedMessage)
+                }
             }
+
         }
     }
 

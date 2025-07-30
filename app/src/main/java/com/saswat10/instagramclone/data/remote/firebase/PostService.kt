@@ -71,7 +71,18 @@ class PostService @Inject constructor(
     }
 
     override suspend fun getPosts(userId: String): Result<List<PostDto?>> {
-        TODO("Not yet implemented")
+        return runCatching {
+            val query = postCollection
+                .whereEqualTo(FirebaseConstantsV2.Posts.FIELD_USER_ID, userId)
+                .orderBy(FirebaseConstantsV2.Common.CREATED_AT, Query.Direction.DESCENDING)
+                .get()
+                .await()
+
+
+            query.documents.mapNotNull {documentSnapshot ->
+                documentSnapshot.toObject(PostDto::class.java)
+            }
+        }
     }
 
     override fun getPostsPaginated(

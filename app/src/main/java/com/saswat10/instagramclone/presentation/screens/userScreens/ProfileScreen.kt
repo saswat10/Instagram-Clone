@@ -1,19 +1,26 @@
 package com.saswat10.instagramclone.presentation.screens.userScreens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
+import com.saswat10.instagramclone.R
 import com.saswat10.instagramclone.navigation.MainNavRoutes
 import com.saswat10.instagramclone.presentation.components.common.SimpleHeader
+import com.saswat10.instagramclone.presentation.components.posts.MediaType
 import com.saswat10.instagramclone.presentation.components.user.AvatarDetailCard
 import com.saswat10.instagramclone.viewmodels.ProfileViewModel
 
@@ -25,17 +32,42 @@ fun ProfileScreen(
     onSignOut: () -> Unit
 ) {
     val user by profileViewModel.user.collectAsState()
+    val posts by profileViewModel.posts.collectAsState()
 
-    Column() {
-        SimpleHeader("@" + user.username)
-        Column(Modifier.padding(8.dp)) {
-            AvatarDetailCard(user, onSignOut = {
-                profileViewModel.signOut()
-                onSignOut()
-            }, onEdit = { navigateTo(MainNavRoutes.UpdateScreen) })
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+    ) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Column() {
+                SimpleHeader("@" + user.username)
+                Column(Modifier.padding(8.dp)) {
+                    AvatarDetailCard(user, onSignOut = {
+                        profileViewModel.signOut()
+                        onSignOut()
+                    }, onEdit = { navigateTo(MainNavRoutes.UpdateScreen) })
+                }
+
+
+                HorizontalDivider()
+            }
+        }
+        items(posts) {
+            if (it?.media[0]?.type == MediaType.VIDEO) AsyncImage(
+                model = R.drawable.astronaut_nord, null, modifier = Modifier.aspectRatio(1f),
+                contentScale = ContentScale.Crop
+            )
+            else
+                AsyncImage(
+                    it?.media[0]?.url,
+                    "",
+                    modifier = Modifier.aspectRatio(1f),
+                    contentScale = ContentScale.Crop
+                )
         }
     }
 }
+
 
 //
 //@OptIn(ExperimentalMaterial3Api::class)

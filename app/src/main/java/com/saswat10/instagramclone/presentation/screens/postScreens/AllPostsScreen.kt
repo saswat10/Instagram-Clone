@@ -67,14 +67,14 @@ class FeedViewModel @Inject constructor(
     private val userPreferencesRepository: UserDatastoreRepository
 ): ViewModel(){
 
-    init {
-        viewModelScope.launch {
-            val currentUserId = authRepository.observeAuthState()?.uid
-            if(currentUserId != null && userRepository.user.value == User()){
-                userRepository.getUserById(currentUserId)
-            }
-        }
-    }
+//    init {
+//        viewModelScope.launch {
+//            val currentUserId = authRepository.observeAuthState()?.uid
+//            if(currentUserId != null && userRepository.user.value == User()){
+//                userRepository.getUserById(currentUserId)
+//            }
+//        }
+//    }
 
 }
 

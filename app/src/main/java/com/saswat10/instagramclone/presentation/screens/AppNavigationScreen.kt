@@ -1,10 +1,13 @@
 package com.saswat10.instagramclone.presentation.screens
 
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.Companion.Left
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection.Companion.Right
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
@@ -69,39 +72,29 @@ fun AppNavigationScreen(
 
     Scaffold(
         bottomBar = {
-            if (!uiState.loading && showNavBar) BottomNavBar(
-                navController, currentRoute
-            )
+            AnimatedVisibility(
+                visible = !uiState.loading && showNavBar
+            ) {
+                BottomNavBar(
+                    navController, currentRoute
+                )
+            }
         }) { padValues ->
         Column(modifier = Modifier.padding(padValues)) {
             if (!uiState.loading) {
                 NavHost(
                     navController = navController, startDestination = uiState.startDestination,
                     enterTransition = {
-                        slideInHorizontally(
-                            initialOffsetX = { fullWidth -> fullWidth }, // Starts from right
-                            animationSpec = tween(durationMillis = 300)
-                        ) + fadeIn(animationSpec = tween(durationMillis = 300))
+                        fadeIn(animationSpec = tween(700, easing = FastOutSlowInEasing))
                     },
                     exitTransition = {
-                        slideOutHorizontally(
-                            targetOffsetX = { fullWidth -> -fullWidth }, // Slides to left
-                            animationSpec = tween(durationMillis = 300)
-                        ) + fadeOut(animationSpec = tween(durationMillis = 300))
+                        fadeOut(animationSpec = tween(700, easing = FastOutSlowInEasing))
                     },
                     popEnterTransition = {
-                        // Define the pop enter animation for this screen (when navigating back to Home)
-                        slideInHorizontally(
-                            initialOffsetX = { fullWidth -> -fullWidth }, // Slides in from left
-                            animationSpec = tween(durationMillis = 300)
-                        ) + fadeIn(animationSpec = tween(durationMillis = 300))
+                        fadeIn(animationSpec = tween(700, easing = FastOutSlowInEasing))
                     },
                     popExitTransition = {
-                        // Define the pop exit animation for this screen (when Home is popped off stack)
-                        slideOutHorizontally(
-                            targetOffsetX = { fullWidth -> fullWidth }, // Slides out to right
-                            animationSpec = tween(durationMillis = 300)
-                        ) + fadeOut(animationSpec = tween(durationMillis = 300))
+                        fadeOut(animationSpec = tween(700, easing = FastOutSlowInEasing))
                     }
                 ) {
                     authNavGraph(navController)
